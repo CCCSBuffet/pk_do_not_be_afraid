@@ -1,6 +1,6 @@
 # Do Not Be Afraid
 
-For those worrying about COMP ORG next term, assembly language is much easier to master if you just let go of your expectations.
+For those worrying about CSC 2510 next term, assembly language is much easier to master if you let go of your expectations.
 
 ## V1
 
@@ -25,7 +25,7 @@ In this version, we lose the `while` loop, replacing it with:
 
 * a label
 * an `if`
-* a goto
+* a goto (this might be the only time you'll see goto used!)
 
 ```c++
 #include <iostream>
