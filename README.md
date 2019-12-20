@@ -101,12 +101,14 @@ bottom:
 	ret
 ```
 
+Of interest are the lines between `top` and `bottom` - notice how naturally the assembly language flows from the high level language. 
+
 ## Bottom line
 
-<center><i>That which you resist, persists.</i></center>
+*That which you resist, persists.*
 
-The more you refuse to let go of your high level language syntactic sugar, the harder grokking assembly language will be - making this course harder than it needs to be.
+CSC 2510 will be much easier if you relax and keep an open mind.
 
-Relax! Free your mind, and you'll soon see things the way they **really** are.
+Free your mind, and you'll soon see things the way they **really** are.
 
 ![matrix](./m.jpg)
