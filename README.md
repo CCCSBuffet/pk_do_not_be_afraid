@@ -105,7 +105,7 @@ bottom:
 
 <center><i>That which you resist, persists.</i></center>
 
-The more you refuse to let go of your high level language syntactic sugar, the harder grokking assembly language will be.
+The more you refuse to let go of your high level language syntactic sugar, the harder grokking assembly language will be - making this course harder than it needs to be.
 
 Relax! Free your mind, and you'll soon see things the way they **really** are.
 
