@@ -1,6 +1,6 @@
 # Do Not Be Afraid
 
-Assembly language is much easier to master if you just let go of your expectations.
+For those worrying about COMP ORG next term, assembly language is much easier to master if you just let go of your expectations.
 
 ## V1
 
@@ -107,6 +107,6 @@ bottom:
 
 The more you refuse to let go of your high level language syntactic sugar, the harder grokking assembly language will be.
 
-Free your mind, and you'll soon see things the way they **really** are.
+Relax! Free your mind, and you'll soon see things the way they **really** are.
 
 ![matrix](./m.jpg)
