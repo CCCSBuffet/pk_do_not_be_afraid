@@ -90,10 +90,10 @@ main:
 	mov		x21, x1
 
 top:
-	ldr		x0, [x21], 8
-	cbz		x0, bottom
-	bl		puts
-	b		top
+	ldr		x0, [x21], 8           // argv++, old dereferenced value in x0
+	cbz		x0, bottom             // if *argv == NULL goto bottom
+	bl		puts                   // puts(*argv)
+	b		top                    // goto top
 
 bottom:
 	mov		x0, xzr	
