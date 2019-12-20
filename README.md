@@ -101,7 +101,7 @@ bottom:
 	ret
 ```
 
-Of interest are the lines between `top` and `bottom` - notice how naturally the assembly language flows from the high level language. It is also nteresting how braces can become labels and branches. 
+Of interest are the lines between `top` and `bottom` - notice how naturally the assembly language flows from the high level language. It is also interesting how braces can become labels and branches. 
 
 ## Bottom line
 
