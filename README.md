@@ -44,7 +44,7 @@ int main(int argc, char * argv[]) {
 
 ## V3
 
-In this version we lose the fancy shmancy `cout` / `endl`. At this point, we're no longer C++, just C.
+In this version we lose the `cout` / `endl`. At this point, we're no longer C++, just C.
 
 ```c
 #include <stdio.h>
