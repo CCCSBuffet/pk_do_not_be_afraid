@@ -107,6 +107,6 @@ bottom:
 
 The more you refuse to let go of your high level language syntactic sugar, the harder grokking assembly language will be.
 
-Free your mind, and you'll soon see it's all the same.
+Free your mind, and you'll soon see things the way they **really** are.
 
 ![matrix](./m.jpg)
