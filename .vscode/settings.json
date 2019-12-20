@@ -1,0 +1,8 @@
+{
+	"files.exclude": {
+		"**/v1": true,
+		"**/v2": true,
+		"**/v3": true,
+		"**/v4": true
+	}
+}
