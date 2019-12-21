@@ -85,9 +85,10 @@ int main(int argc, char * argv[]) {
 Here is the same code expressed in ARM V8 assembly language.
 
 ```text
+	.global		main
 main:
-	stp		x21, x30, [sp, -16]!	
-	mov		x21, x1
+	stp		x21, x30, [sp, -16]!   // push onto stack
+	mov		x21, x1                // argc -> x0, argv -> x1
 
 top:
 	ldr		x0, [x21], 8           // argv++, old dereferenced value in x0
@@ -96,8 +97,8 @@ top:
 	b		top                    // goto top
 
 bottom:
-	mov		x0, xzr	
-	ldp		x21, x30, [sp], 16	
+	ldp		x21, x30, [sp], 16     // pop from stack
+	mov		x0, xzr	               // return 0
 	ret
 ```
 
