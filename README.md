@@ -108,7 +108,7 @@ Of interest are the lines between `top` and `bottom` - notice how naturally the 
 
 *That which you resist, persists.*
 
-CSC 2510 will be much easier if you relax and keep an open mind.
+CSC 3510 will be much easier if you relax and keep an open mind.
 
 Free your mind, and you'll soon see things the way they **really** are.
 
