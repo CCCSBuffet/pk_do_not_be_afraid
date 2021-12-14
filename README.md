@@ -287,4 +287,71 @@ version and perform the same roles.
 
 ### Line 1
 
-`main` is a function that is specially named.
+`main` is a function that is specially named. `Line 1` instructs the assembler to make the name and location of `main` visible to the *linker*. To refresh your knowledge of the linker, [see here](https://youtu.be/Iv3psS4n9j8).
+
+Without `Line 1`, building the executable will fail with an unresolved symbol error - namely that the linker could not find `main`.
+
+### Line 2
+
+In `Line 1` we told the assembler to publish the location of the label `main`. In `Line 2` we're actually specifying the value of `main`. Contrast `main` with `top` and `bottom`. The difference between them is that only `main` is made visible outside this source code. Again, in the case of `main`, the label must be specified as `global` so that the linker will find it. `top` and `bottom` are also labels but they are not published outside this one source file.
+
+
+### Line 3
+
+This instruction copies the value in two *registers* onto your *stack*. There's a lot of new information here.
+
+*Registers* are ultra highspeed storage locations built into the circuitry of the processor. On the ARM, all computation takes place in the registers (with very few exceptions). In a higher level language, when you say:
+
+```c++
+x = x + 1;
+```
+
+the assembly language to implement this looks like:
+
+```text
+1. Load the address of x into a register.
+2. Go to that address and fetch what it contains into a register.
+3. Add one to that value (in the register).
+4. Store the value back to memory using the address loaded on line 1.
+```
+
+The thing to note here is that the increment of x didn't happen in memory - it happened in a register. The value in x had to be loaded into a register, incremented in the register and finally written back to memory.
+
+The *stack* is a region of memory used to store local variables as well as the trail of breadcrumbs which allows functions to return from whence they were invoked. In a high level language, you don't manage the stack yourself. Values go onto the stack (push) and leave the stack (pop) passively by virtue of having made function calls. In assembly language *you* manage the stack.
+
+`Line 3` `st`ores a `p`air of registers on the stack. `stp` means *store pair*. The registers being copied to the stack are `x21` and `x30`. `x30` is special as it contains the address that this function to which this function should return. If your function makes any function calls itself (`main` does - it calls `puts`) then `x30` gets overwritten with each function call. If we don't *save* `x30` on the stack when `main` initially enters, our ability to properly return to whoever called `main` would be broken. In all likelihood when this program ended it would crash.
+
+`x21` is also being saved on the stack. *Calling conventions* specify some registers can be blown away (used as scratch) while some registers must be preserved and restored to their previous values upon leaving the function. `x21` will be used in `main` so its original value must be preserved.
+
+Finally let's look at `[sp, -16]!`. There's a lot going on here. 
+
+First, the `[` and `]` serve the same purpose of the asterisk in C and C++ indicating "dereference." It means use what's inside the brackets as an address. Next, `sp` means use the stack pointer - a register which keeps track of where your stack currently is,. The `-16` subtracts 16 from the current value of the stack register. `x` registes like `x21` and `x30` are each 8 bytes (64 bits) wide. This accounts for the value 16 (i.e. 2 \* 8). Lastly, the exclamation point means that the stack pointer should be changed (i.e. the -16 applied to it) before the value of the stack pointer is used as the address in memory to which the registers will be copied.
+
+The stack pointer in ARM V8 can only be manipulated in multiples of 16.
+
+In a higher level language `Line 3` would look like this:
+
+```c++
+*(--sp) = x21;
+*(--sp) = x30;
+```
+
+That is, subtract 8 from the stack pointer and put `x21` at that location. Then, subtract 8 from the stack pointer and put `x30` at that location.
+
+### Line 4
+
+When a function is passed parameters, up to 8 of them can be found in the first 8 scratch registers (`x0` through `x7`). Recall:
+
+```c++
+main(int argc, char ** argv)
+```
+
+`argc` is the first parameter. It shows up to the function in register `x0`. This is a slight oversimplification because `x` registers are 64 bits wide and `int` is 32 bits wide. The simplification isn't relevent here so let's continue.
+
+`argv` is the second parameter to `main`. Being second, it shows up in `main` in register `x1`. `x0` through `x7` are truely scratch registers - they can be overwritten with new values at any time. Because of this, `argv` that arrives in `x1` is preserved in `x21` (whose original value we preserved on the stack).
+
+```asm
+mov   x21, x1
+```
+
+can be read as `copy what is in x1 into x21`.
