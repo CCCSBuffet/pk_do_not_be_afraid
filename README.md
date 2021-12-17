@@ -346,12 +346,62 @@ When a function is passed parameters, up to 8 of them can be found in the first 
 main(int argc, char ** argv)
 ```
 
-`argc` is the first parameter. It shows up to the function in register `x0`. This is a slight oversimplification because `x` registers are 64 bits wide and `int` is 32 bits wide. The simplification isn't relevent here so let's continue.
+`argc` is the first parameter. It shows up to the function in register `x0`. This is a slight oversimplification because `x` registers are 64 bits wide and `int` is 32 bits wide. The simplification isn't relevant here so let's continue.
 
-`argv` is the second parameter to `main`. Being second, it shows up in `main` in register `x1`. `x0` through `x7` are truely scratch registers - they can be overwritten with new values at any time. Because of this, `argv` that arrives in `x1` is preserved in `x21` (whose original value we preserved on the stack).
+`argv` is the second parameter to `main`. Being second, it shows up in `main` in register `x1`. `x0` through `x7` are truly scratch registers - they can be overwritten with new values at any time when calling other functions (like `main` will call `puts`). Because of this, `argv` that arrives in `x1` is preserved in `x21` (whose original value we already preserved on the stack).
 
 ```asm
 mov   x21, x1
 ```
 
 can be read as `copy what is in x1 into x21`.
+
+## Line 6
+
+This line contains the label `top`. The instruction that follows (the `ldr`) is stored at some address. The value of `top` is that address. The unconditional branch on `line 10` specifies `top` as the destination of the branch. You can think of `line 10` as the closing brace of the original while loop.
+
+## Lines 7, 8 and 9
+
+Version 4 contains:
+
+```c++
+5) if (*argv == NULL)
+6)    goto bottom;
+7) puts(*(argv++));
+```
+
+These three lines are implemented on `lines 7, 8 and 9` in the assembly language. These instructions are:
+
+```asm
+7)   ldr   x0, [x21], 8
+8)   cbz   x0, bottom
+9)   bl    puts
+```
+
+The action of the assembly language statement differs slight in the order in which the C++ operates.
+
+In both cases, `argv` is dereferenced first. In C++ this is done with `*argv`. In the assembly language, this is done with `[x21]` (recall, we put `x1` into `x21`).
+
+In C++ the increment of `argv` is done on line 7 - the `++` post increment. In the assembly language, the post increment is done on `line 7` which is the *first* instruction of the three whereas in C++ the post increment happens on the *last* line of three.
+
+This difference is OK because the older value of `argv` is preserved in `x0`. As long as we can get at the value of `argv` before the increment, it doesn't matter where the increment is done.
+
+The *if* happens on the first line of the C++ but done on the middle line of the assembly language. `cbz` stands for *`C`onditional `B`ranch if `Z`ero*.
+
+The `goto` or branch happens on the middle line (`line 8`) of the assembly language. Very economical in terms of code!
+
+`puts` is called with the un-incremented version of argv in the C++ version - again notice the use of post increment. In the assembly language version this is also the case. How? `argv` before the increment was put in `x0`. That value is still sitting in `x0` when the function call (`bl`) is made.
+
+A word about `bl`. That instruction puts the address of the *next* (`line 10`) instruction into `x30` behind the scenes. This is why we backed up `x30` on `line 3`. When `puts` executes its return (`ret`), control will branch to `line 10`.
+
+## Line 10
+
+`Line 10` is exactly the same as `line 8` of Version 4. It hides out as the closing brace on `line 8` of Version 1.
+
+## Lines 13, 14 and 15
+
+`Lines 13` through `15` implement the return of zero found on `line 11` of Version 4. The original values of `x21` and `x30` are restored. The stack pointer is post incremented back to where it started. Zero is put in `x0` and `main` returns.
+
+## Summary
+
+Assembly language is scary to a lot of people. It doesn't need to be. We have shown one small example of how close C is to assembly language. With a little practice, one can code in assembly language at pretty much the same speed as C. We are not advocating the ditching of your high level languages rather... always use the *right* tool for the *right* job. We do maintain that understanding assembly language principles will likely improve your higher level language coding.
