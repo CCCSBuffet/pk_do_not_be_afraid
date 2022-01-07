@@ -21,8 +21,6 @@ Linux `calling conventions` are used. That is, the assembly language is designed
 | ------- | ----------- |
 | [Hello World](./helloworld.md) | Demonstrates how close `C` is to assembly language |
 | [if](./if.md) | Demonstrates implementation of both `if` and `if` / `else` |
-| [for](./for.md) | Demonstrates implementation of a `for` loop |
 | [while](./while.md) | Demonstrates implementation of a `while` loop |
+| [for](./for.md) | Demonstrates implementation of a `for` loop |
 | [Function Call](./func.md) | Demonstrates implementation of function calls and returns |
-
-
