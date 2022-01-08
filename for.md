@@ -19,38 +19,47 @@ In `C`, a for loop looks like this:
 
 ![for in c](./for01c.png)
 
-## In Assembly Language
+## How You Picture It Versus How It is Implemented
 
-In assembly language there are different ways of representing a `for` loop. We'll represent it like this first:
+The image on the left, below, represents from top to bottom what the parts of the `for` are from left to right (the post step being found at the bottom).
 
 ![for](./for.jpeg)
 
-Notice how we perform the set up step then skip over the post step before the first loop. Thereafter, we have a `while` loop which includes the post step before the evaluation of the boolean condition. *Organizing the code for a `for` loop in this way makes the implementation of a `continue` statement trivial (not shown in this first example).
+The image on the right, above, depicts how `for` loops are typically implemented. The reason for this becomes clear when we see the assembly language.
 
-## Concrete Example
+## In Assembly Language
 
-Given this code:
+This code:
 
 ![for in c](./for02c.png)
 
-would be implemented like this in assembly language:
+could be implemented like this in assembly language:
 
 ![for in s](./for03s.png)
 
-### Line 3
+This corresponds to the flow chart on the left, above. There are 4 instructions in the loop (ignoring the code block).
 
-`Line 3` causes us to skip from the set up code directly to the evaluation of the decision. This skips over the increment (serving as our post step). This branch happens just once.
+The next set of assembly language corresponds to the flow chart on the right, above, where the post step and decision comes *after* the code block.
 
-### Line 5
+![for in s](./for04s.png)
 
-`Line 5` implements the post step, in this case an increment of the loop counter. Then, execution falls through to the evaluation of the decision, as you would expect. By doing it this way, `continue` is implemented in exactly the same way as the end of a loop. Not doing it this way will cause extra code to be necessary to implement a `continue`.
+Notice this contains one fewer lines of assembly language within the loop itself (3 lines versus 4).
 
 ## Implementing a `continue`
 
+Now let's add a `continue` to the code block, dividing it in two. 
+
+Here is what we would need to write to support a `continue` if the "conventional" ordering were used with the decision evaluation at the top:
+
+![for s](./for06s.png)
+
+Below, is how a `for` loop is **typically** implemented.
+
 ![for s](./for05s.png)
 
-### If the Post Step Came at the End
+Once again, the code moving the post step and decision evaluation to the bottom is one fewer instruction inside the loop.
 
-Here is the same code but with the post step moved to the end of the code block:
+## Summary
 
-![for in s](./for04s.png)
+`for` loops typically contain code ordering different from what one might expect. This is done to save an instruction. While this doesn't sound like much, consider the case where the loop is executed billions of times. In this case, saving one instruction per loop prevents the execution of a billion instructions.
+The shorter the code block is, the more important it is to save one instruction from within the loop.
