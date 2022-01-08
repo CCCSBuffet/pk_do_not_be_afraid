@@ -11,7 +11,7 @@ These documents are designed for readers who are familiar with `C` or `C++`. Eac
 document bridges the reader's understanding of the higher level language to the
 corresponding assembly language.
 
-The `AARCH64` ISA is used. That is, the assembly language use is that of the 64 bit ARM processor.
+The `AARCH64` ISA is used. That is, the assembly language used is that of the 64 bit ARM processor.
 
 Linux `calling conventions` are used. That is, the assembly language is designed to be run on Linux machines. Even though Macintosh M1 machines are `AARCH64`, the conventions they use are specific to the Mac - big surprise.
 
