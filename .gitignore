@@ -5,6 +5,7 @@ v2
 v3
 v4
 *.*SYM
+.DS_Store
 
 # Compiled Object files
 *.slo
