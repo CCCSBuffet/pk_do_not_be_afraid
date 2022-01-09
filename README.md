@@ -13,9 +13,17 @@ corresponding assembly language.
 
 The `AARCH64` ISA is used. That is, the assembly language used is that of the 64 bit ARM processor.
 
+Assembly language text books typically cover the MIPS ISA because it has been around forever and isn't x86. We consider the MIPS processor as having 1.5 feet in the dustbin of history.
+
+A few texts cover the x86. We consider the x86 an abominable mass of poodles jumping through hoops to allow the modern to coexist with the ancient. Poodles jumping through hoops is best viewed on youtube, not in a text book.
+
+The ARM V8 ISA (AARCH64) is current *and* reasonable.
+
 Linux `calling conventions` are used. That is, the assembly language is designed to be run on Linux machines. Even though Macintosh M1 machines are `AARCH64`, the conventions they use are specific to the Mac - big surprise.
 
-## Chapters
+## Part 1 - Bridging Common Language Constructs
+
+Some might argue this makes a strange choice of initial chapters. To many, Part 2's material will make more sense to come first. Our choice of putting this material first is born from the desire to bridge the higher level language concepts you already know to the underlying technology. **Then** we'll go into details hopefully having broken through the common fear of assembly language.
 
 | Chapter | Description |
 | ------- | ----------- |
@@ -23,4 +31,17 @@ Linux `calling conventions` are used. That is, the assembly language is designed
 | [if](./if.md) | Demonstrates implementation of both `if` and `if` / `else` |
 | [while](./while.md) | Demonstrates implementation of a `while` loop |
 | [for](./for.md) | Demonstrates implementation of a `for` loop |
-| [Function Call](./func.md) | Demonstrates implementation of function calls and returns |
+| [Function Calls and Returns](./func.md) | Demonstrates implementation of function calls and returns - Not written yet |
+| [Structs](./structs.md) | Demonstrates use of `struct` and by extension, `class` - Not written yet |
+
+## Part 2 - Details on Registers and their Usage
+
+All the action happens in the registers. Bottom line is that the variables you are accustomed to using in a higher level language are artificial constructs layered on top of the processor's registers. Understanding this is key to understanding assembly language programming.
+
+| Chapter | Description |
+| ------- | ----------- |
+| Registers Versus Variables | Not written |
+| Register Widths | Not written |
+| Floating Point Registers | No written |
+| Scratch Registers | Not written |
+| Push and Pop of Registers | Not written |
