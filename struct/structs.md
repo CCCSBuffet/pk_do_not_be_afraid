@@ -82,6 +82,8 @@ We aren't going to discuss why these registers are being backed up at this time 
 
 `Line 14` is making space for `Foo` which coincidentally enough is done on `Line 14` of the `C` code.
 
+`Line 15` copies the current value of `sp` to `x20`. `x20` was backed up on `line 13`. We will use `x20` as the *base address* of the `struct`. All dereferences will resolve to offsets relative to this base-address.
+
 `Line 17` through `line 20` implement `line 15` of the `C` code.
 
 Recall that the first 8 registers are used to pass the first 8 arguments to function calls. They are used starting at register 0 in increasing order from left to right in the higher level language.
@@ -101,3 +103,49 @@ Note that `xn` and `wn` are the same registers - the use of `x` versus `w` tells
 `Line 20` is the function call to `memset()`.
 
 `Lines 22` through `27` set up and call `printf()`.
+
+`Line 22` is worth a deep dive.
+
+On `line 36` you'll find the template string to be passed to `printf()`. The string's address is `fmt` - that is, the label allows you to refer to the string somewhere in the code. The string is a zero terminated array of bytes. The `z` in the assembler directive `.asciz` is what causes the zero termination.
+
+`Line 22` is interesting because the `=` preceding `fmt` causes the assembler to perform some trickery. Addresses are 8 bytes wide (64 bits). **BUT** all AARCH64 instructions are 4 bytes wide (32 bits). How can you specify an 8 byte value by fitting it in an instruction that is only 4 bytes wide? Answer: The `=` causes the assembler to do the work behind the scenes to divide the address specified by `fmt` into two parts. The first part is the address of the `ldr` instruction itself. The second part is the offset of the string relative to the instruction provided the linker places the string within +/- 4 mebibytes of the instruction.
+
+The net of this is that `x0` will get the address of the template string.
+
+`x0` is used because it is the first parameter to `printf()`. An `x` register is used because addresses are 8 bytes wide.
+
+`Line 23` uses `x20` as a base address. It adds `_A` to that address (on `line 5` we set `_A` to be equivalent to `0`) forming a complete address. The 8 byte memory location specified by the complete address is loaded into `x1`. We use an `x` register because the memory location being dereferences is a `long`. We use `x1` because this is the second parameter to `printf()`.
+
+`Line 24` is similar except the value being dereferenced is at a different offset from the base address and also, it is a 4 byte `int` so a `w` register variant is used instead of `x`.
+
+`Line 25` is similar except the value being dereferenced is at a different offset from the base address and also, it is a 2 byte `short`. `w` registers are used for `int`, `short` and `char`. We tell the assembler which of these we want by varying the `ldr` mnemonic. On `line 25` we use `ldrh` where the `h` is for *half*. A `short` is half the width of an `int`.
+
+`Line 26` is similar again except we're using a different offset from the base register and we're using `ldrb` to specify that we want to dereference a single `b`yte.
+
+`Line 27` is the function call to `printf()`.
+
+`Line 29` pops the local variable `foo` off the stack. Remember we have a copy of the older value of the stack pointer in `x20`. Don't use it anymore! Once the stack pointer has been popped, consider the data that was in the popped area to be gone!
+
+`Line 30` restores the value of `x20` to what it was when it was backed up on `line 13`. It also pops the stack by 16 bytes. This is a post increment. We know it's an increment because 16 is positive. Recall that the stack must be manipulated in multiples of 16 even though only one register is being loaded.
+
+`Line 31` is similar except a `p`air of registers are being restored. This undoes `line 12`.
+
+`Line 32` sets us up to return 0 from `main()`.
+
+`Line 33` is the return from `main()`.
+
+`Line 35` is similar to `line 3` except it says that what comes next is data, not instructions. It is important to keep data and instructions segregated so that the instruction area of memory can be marked read-only. This prevents self-modifying code. This is a good thing because permitting self-modifying code would allow all kinds of exploits for malware. This is a bad thing because writing self-modifying code was *fun*.
+
+`Line 37` is an assembler directive that says anything found in the source file beyond this should be considered an error. It is optional.
+
+## Relationship to `Classes`
+
+`C++` `classes` are `structs` with some added compiler magic. Poof! Mind blown.
+
+A `class` method is passed a hidden `this` pointer which is nothing more than the base address of the data members. So, accessing all data members in a `class` follows the exact same principles as with `struct`.
+
+## Summary
+
+`Structs` are accessed via offsets from the base address of the `struct` itself.
+
+*This is how arrays also work, by the way.*
