@@ -1,7 +1,5 @@
 # For Loops
 
-**REDO THIS PUTTING BOTH POST STEP AND DECISION AT THE BOTTOM.**
-
 ## Attribution
 
 This work is created by Perry Kivolowitz, Professor and Chair of Computer Science at Carthage College. It is copyright © 2021 and may be freely

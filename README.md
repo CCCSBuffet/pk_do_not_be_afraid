@@ -33,6 +33,7 @@ Some might argue this makes a strange choice of initial chapters. To many, Part 
 | [for](./for/for.md) | Demonstrates implementation of a `for` loop |
 | [Function Calls and Returns](./func/func.md) | Demonstrates implementation of function calls and returns |
 | [Structs](./struct/structs.md) | Demonstrates use of `struct` and by extension, `class` |
+| [Braces](./braces/braces.md) | Focuses on how braces translate into assembly language |
 
 ## Part 2 - Details on Registers and their Usage
 
