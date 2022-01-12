@@ -331,7 +331,7 @@ The stack pointer in ARM V8 can only be manipulated in multiples of 16.
 
 In a higher level language `Line 3` would look like this:
 
-```c++
+```c++=
 *(--sp) = x21;
 *(--sp) = x30;
 ```
