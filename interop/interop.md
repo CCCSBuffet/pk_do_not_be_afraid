@@ -66,7 +66,7 @@ The actual code is [here](../struct/testasm.s)
 
 Bourne approached Ritchie with the idea of `void` functions with the explanation that requiring every function to return something, functions which didn't need to return anything contained an extra assembly language instruction (needed to initialize the return value). Ritchie jumped at the opportunity to save one instruction per applicable function as there were so many. At one instruction each, a large amount of memory was saved and execution speed increased.
 
-Please excuse me acting like a fanboy for a moment... Here's my picture of Ritchie taken at the 1983 USENIX Conference.
+Please excuse me acting like a fanboy for a moment... Here's my picture of Ritchie taken at the 1982 USENIX Conference.
 
 ![Dennis Ritchie](https://upload.wikimedia.org/wikipedia/commons/5/5e/Dennis_Ritchie_in_a_chalet_in_the_mountains_surrounding_Salt_Lake_City%2C_Utah--Summer_1984%2C_Usenix_conference.jpg)
 
