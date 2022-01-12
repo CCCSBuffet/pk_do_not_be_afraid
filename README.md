@@ -27,12 +27,12 @@ Some might argue this makes a strange choice of initial chapters. To many, Part 
 
 | Chapter | Description |
 | ------- | ----------- |
-| [Hello World](./helloworld.md) | Demonstrates how close `C` is to assembly language |
-| [if](./if.md) | Demonstrates implementation of both `if` and `if` / `else` |
-| [while](./while.md) | Demonstrates implementation of a `while` loop |
-| [for](./for.md) | Demonstrates implementation of a `for` loop |
-| [Function Calls and Returns](./func.md) | Demonstrates implementation of function calls and returns - Not written yet |
-| [Structs](./structs.md) | Demonstrates use of `struct` and by extension, `class` - Not written yet |
+| [Hello World](./hello_world/helloworld.md) | Demonstrates how close `C` is to assembly language |
+| [if](./if/if.md) | Demonstrates implementation of both `if` and `if` / `else` |
+| [while](./while/while.md) | Demonstrates implementation of a `while` loop |
+| [for](./for/for.md) | Demonstrates implementation of a `for` loop |
+| [Function Calls and Returns](./func/func.md) | Demonstrates implementation of function calls and returns - Not written yet |
+| [Structs](./struct/structs.md) | Demonstrates use of `struct` and by extension, `class` - Not written yet |
 
 ## Part 2 - Details on Registers and their Usage
 
