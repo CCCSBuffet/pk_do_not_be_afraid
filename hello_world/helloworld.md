@@ -287,7 +287,7 @@ version and perform the same roles.
 
 ### Line 1
 
-`main` is a function that is specially named. `Line 1` instructs the assembler to make the name and location of `main` visible to the *linker*. To refresh your knowledge of the linker, [see here](https://youtu.be/Iv3psS4n9j8).
+`main` is a function that is specially named. `Line 1` instructs the assembler to make the name and location of `main` visible to the *linker*. To refresh your knowledge of the linker, see [here](https://youtu.be/Iv3psS4n9j8).
 
 Without `Line 1`, building the executable will fail with an unresolved symbol error - namely that the linker could not find `main`.
 

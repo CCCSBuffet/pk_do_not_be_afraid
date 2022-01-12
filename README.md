@@ -34,6 +34,7 @@ Some might argue this makes a strange choice of initial chapters. To many, Part 
 | [Function Calls and Returns](./func/func.md) | Demonstrates implementation of function calls and returns |
 | [Structs](./struct/structs.md) | Demonstrates use of `struct` and by extension, `class` |
 | [Braces](./braces/braces.md) | Focuses on how braces translate into assembly language |
+| [interop](./interop/interop.md) | Calling assembly language from C and C++ |
 
 ## Part 2 - Details on Registers and their Usage
 
