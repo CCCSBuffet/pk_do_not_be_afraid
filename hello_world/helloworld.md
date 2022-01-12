@@ -41,7 +41,7 @@ Here is the output of this program:
 `Line 1` makes available the default output stream `cout`. `cout` stands for `c`onsole `out`put. The angle brackets (`<` and `>`) indicate the include file `iostream` comes from a language supplied directory as opposed to an
 include file written by you.
 
-For an explanation of what an `include` file is and how it fits into the compilation workflow [see here](https://youtu.be/Iv3psS4n9j8).
+For an explanation of what an `include` file is and how it fits into the compilation workflow see [here](https://youtu.be/Iv3psS4n9j8).
 
 ### Line 3
 
@@ -75,7 +75,7 @@ concept of a *pointer* is essential to understanding assembly language.
 *Pointers* are also scary for new programmers. They don't have to be. When
 you see the word *pointer* used, think *address of* something.
 
-*"pointer to a pointer"* sounds scary too but if you think of pointers as *address of*, then *"pointer to a pointer"* means something which contains the address of something else which itself hold the address of a third thing.
+*"pointer to a pointer"* sounds scary too but if you think of pointers as *address of*, then *"pointer to a pointer"* means something which contains the address of something else which itself hold the address of a thing.
 
 In this case, the first *something* is `argv`. It contains the address of
 an array holding 1 or more addresses of strings.
@@ -166,7 +166,7 @@ will be used soon.
 Next the value of `argv` is incremented (the `++`). We know the value of
 `argv` is captured first because the `++` comes *after* `argv`. This is
 how `argv` changes so as to step through the elements of the array. At
-some point `argv` will contain the address of a `0` - and thar's what
+some point `argv` will contain the address of a `0` - and that's what
 will terminate the `while` loop.
 
 After `argv` is incremented, its **previous** value is *dereferenced* indicated
@@ -219,7 +219,7 @@ This line is a `label`. This is not an instruction, rather it is a way of specif
 The `while` loop has been removed. It has been replaced with explicit use of
 an `if` statement at what was the top of the loop and a `goto` branch at what
 was the bottom. This is how `while` loops are implemented - now we're
-explicitly making this visible.
+explicitly making this visible. For more information on `while` loops see [here](../while/while.md)
 
 ### Line 9
 
