@@ -31,8 +31,8 @@ Some might argue this makes a strange choice of initial chapters. To many, Part 
 | [if](./if/if.md) | Demonstrates implementation of both `if` and `if` / `else` |
 | [while](./while/while.md) | Demonstrates implementation of a `while` loop |
 | [for](./for/for.md) | Demonstrates implementation of a `for` loop |
-| [Function Calls and Returns](./func/func.md) | Demonstrates implementation of function calls and returns - Not written yet |
-| [Structs](./struct/structs.md) | Demonstrates use of `struct` and by extension, `class` - Not written yet |
+| [Function Calls and Returns](./func/func.md) | Demonstrates implementation of function calls and returns |
+| [Structs](./struct/structs.md) | Demonstrates use of `struct` and by extension, `class` |
 
 ## Part 2 - Details on Registers and their Usage
 
