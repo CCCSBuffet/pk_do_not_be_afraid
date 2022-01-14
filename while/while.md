@@ -7,7 +7,7 @@ shared for educational purposes.
 
 ## Overview
 
-We have already covered [the `if`](./if.md) statement. A `while` loop is exactly the same with the addition of one branch and one label. It really is that simple.
+We have already [covered](../if/if.md) the `if` statement. A `while` loop is exactly the same with the addition of one branch and one label. It really is that simple.
 
 To illustrate this, here is a flow chart of an `if` statement (on the left) compared to a `while` loop (on the right).
 
@@ -19,10 +19,28 @@ The new label is placed before evaluating the "Decision". The new unconditional 
 
 For review, here is the assembly language for an `if` statement:
 
-![if](./if01s.png)
+```asm
+    // Assume value of a is in x0                                       // 1 
+    // Assume value of b is in x1                                       // 2 
+    cmp     x0, x1                                                      // 3 
+    ble     1f                                                          // 4 
+    // CODE BLOCK                                                       // 5 
+1:                                                                      // 6 
+```
+
 
 Here is the code for the `while` showing one new label and one new unconditional branch:
 
-![while](./while01s.png)
+```asm
+    // Assume value of a is in x0                                       // 1 
+    // Assume value of b is in x1                                       // 2 
+                                                                        // 3 
+ 1: cmp     x0, x1                                                      // 4 
+    ble     2f                                                          // 5 
+    // CODE BLOCK                                                       // 6 
+    b       1b                                                          // 7 
+                                                                        // 8 
+2:                                                                      // 9 
+```
 
-The label `top` could have been a temporary label.
+Temporary lable `2` on `line 9` takes the place of the line after the closing brace in a `while` loop.
