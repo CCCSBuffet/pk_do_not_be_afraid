@@ -283,6 +283,8 @@ int main(int argc, char * argv[]) {                                     // 3
 }                                                                       // 10 
 ```
 
+[Here](./v3.cpp) is the original code.
+
 ### Line 6
 
 `puts` as described above takes the address of a C string and prints it out but with the addition of a trailing new line. What's going on inside the parentheses is identical to the previous versions.
@@ -315,6 +317,8 @@ int main(int argc, char * argv[]) {                                     /* 3 */
         return 0;                                                       /* 11 */
 }                                                                       /* 12 */
 ```
+
+[Here](./v4.c) is the original code.
 
 ### Line 5
 
@@ -358,6 +362,8 @@ bottom:                                                                 // 12
                                                                         // 16 
     .end                                                                // 17 
 ```
+
+[Here](./v5.s) is the original code.
 
 Get your bearings by noticing the labels. They are the same as in our previous
 version and perform the same roles.

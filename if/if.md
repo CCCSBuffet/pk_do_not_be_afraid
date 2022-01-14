@@ -4,12 +4,16 @@ We will begin with the `if` statement followed by a discussion of the `if / else
 
 `if / else if` is not discussed as it is a repeat of the discussion provided here.
 
-## `if` in `C`
+## `if` in `C` and `C++`
 
-Here is a basic `if` statement in `C`:
+Here is a basic `if` statement in `C++`:
 
-![if01c.png](./if01c.png)
-
+```c++
+if (a > b)                                                              // 1 
+{                                                                       // 2 
+    // CODE BLOCK                                                       // 3 
+}                                                                       // 4 
+```
 For simplicity, let us assume that both `a` and `b` are defined as
 `long int`. This means `x` registers will be used in the assembly language.
 
@@ -17,7 +21,14 @@ For simplicity, let us assume that both `a` and `b` are defined as
 
 Here is the above `if` statement rendered into `AARCH64` assembly language:
 
-![if01s.png](./if01s.png)
+```asm
+    // Assume value of a is in x0                                       // 1 
+    // Assume value of b is in x1                                       // 2 
+    cmp     x0, x1                                                      // 3 
+    ble     1f                                                          // 4 
+    // CODE BLOCK                                                       // 5 
+1:                                                                      // 6 
+```
 
 `Lines 1` and `2` indicate that the values currently in the variables `a` and `b` are
 found in registers `x0` and `x1` respectively. Values in memory cannot be operated upon.
@@ -64,7 +75,16 @@ This line acts in place of the `if` statement's closing `}`.
 
 Here is a basic `if` / `else`:
 
-![if02c.png](./if02c.png)
+```c++
+    if (a > b)                                                          // 1 
+    {                                                                   // 2 
+        // CODE BLOCK IF TRUE                                           // 3 
+    }                                                                   // 4 
+    else                                                                // 5 
+    {                                                                   // 6 
+        // CODE BLOCK IF FALSE                                          // 7 
+    }                                                                   // 8 
+```
 
 **There is built-in here two branches!**
 
@@ -74,7 +94,17 @@ Second, the *true* block (if taken) must skip over the *false* block.
 
 Here is the corresponding assembly language.
 
-![if02s.png](./if02s.png)
+```asm
+    // Assume value of a is in x0                                       // 1 
+    // Assume value of b is in x1                                       // 2 
+    cmp     x0, x1                                                      // 3 
+    ble     1f                                                          // 4 
+    // CODE BLOCK IF TRUE                                               // 5 
+    b       2f                                                          // 6 
+1:                                                                      // 7 
+    // CODE BLOCK IF FALSE                                              // 8 
+2:                                                                      // 9 
+```
 
 ### Line 7
 
@@ -88,4 +118,33 @@ Here is the corresponding assembly language.
 
 Without further explanation, here is a complete program you can play around with:
 
-![if03s.png](./if03s.png)
+```asm
+    .global main                                                        // 1 
+    .text                                                               // 2 
+                                                                        // 3 
+main:                                                                   // 4 
+    stp     x29, x30, [sp, -16]!                                        // 5 
+    mov     x1, 10                                                      // 6 
+    mov     x0, 5                                                       // 7 
+                                                                        // 8 
+    cmp     x0, x1                                                      // 9 
+    ble     1f                                                          // 10 
+    ldr     x0, =T                                                      // 11 
+    bl      puts                                                        // 12 
+    b       2f                                                          // 13 
+                                                                        // 14 
+1:  ldr     x0, =F                                                      // 15 
+    bl      puts                                                        // 16 
+                                                                        // 17 
+2:  ldp     x29, x30, [sp], 16                                          // 18 
+    mov     x0, xzr                                                     // 19 
+    ret                                                                 // 20 
+                                                                        // 21 
+    .data                                                               // 22 
+F:  .asciz  "FALSE"                                                     // 23 
+T:  .asciz  "TRUE"                                                      // 24 
+                                                                        // 25 
+    .end                                                                // 26 
+```
+
+[Here](./if05.s) is the original code.
