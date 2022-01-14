@@ -11,11 +11,16 @@ We have already covered the [`if`](./if.md) and [`while`](./while.md) statements
 
 A `for` loop is only slightly more complex.
 
-## In `C`
+## In `C++` and `C`
 
-In `C`, a for loop looks like this:
+In `C++` and `C`, a for loop looks like this:
 
-![for in c](./for01c.png)
+```c++
+    for (set up; decision; post step)                                   // 1 
+    {                                                                   // 2 
+        // CODE BLOCK                                                   // 3 
+    }                                                                   // 4 
+```
 
 ## How You Picture It Versus How It is Implemented
 
@@ -23,25 +28,58 @@ The image on the left, below, represents from top to bottom what the parts of th
 
 ![for](./for.jpeg)
 
-The image on the right, above, depicts how `for` loops are typically implemented. The reason for this becomes clear when we see the assembly language.
+The image on the right, above, depicts how `for` loops are *typically* implemented. The reason for this becomes clear when we see the assembly language.
 
 ## In Assembly Language
 
 This code:
 
-![for in c](./for02c.png)
+```c++
+    for (long i = 0; i < 10; i++)                                       // 1 
+    {                                                                   // 2 
+        // CODE BLOCK                                                   // 3 
+    }                                                                   // 4 
+```
 
 could be implemented like this in assembly language:
 
-![for in s](./for03s.png)
+```asm
+    // Assume i is implemented using x0                                 // 1 
+                                                                        // 2 
+    mov     x0, xzr                                                     // 3 
+                                                                        // 4 
+1:  cmp     x0, 10                                                      // 5 
+    bge     2f                                                          // 6 
+                                                                        // 7 
+    // CODE BLOCK                                                       // 8 
+                                                                        // 9 
+    add     x0, x0, 1                                                   // 10 
+    b       1b                                                          // 11 
+                                                                        // 12 
+2:                                                                      // 13 
+```
 
-This corresponds to the flow chart on the left, above. There are 4 instructions in the loop (ignoring the code block).
+This corresponds to the flow chart on the **left**, above. There are 4 instructions in the loop (ignoring the code block).
 
 The next set of assembly language corresponds to the flow chart on the right, above, where the post step and decision comes *after* the code block.
 
-![for in s](./for04s.png)
+```asm
+    // Assume i is implemented using x0                                 // 1 
+                                                                        // 2 
+    mov     x0, xzr                                                     // 3 
+    b       2f                                                          // 4 
+                                                                        // 5 
+1:                                                                      // 6 
+                                                                        // 7 
+    // CODE BLOCK                                                       // 8 
+                                                                        // 9 
+    add     x0, x0, 1                                                   // 10 
+2:  cmp     x0, 10                                                      // 11 
+    blt     1b                                                          // 12 
+                                                                        // 13 
+```
 
-Notice this contains one fewer lines of assembly language within the loop itself (3 lines versus 4).
+Notice this contains one fewer lines of assembly language within the loop itself (3 lines versus 4). Again, the contents of the code block are not counted.
 
 ## Implementing a `continue`
 
