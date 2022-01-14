@@ -339,7 +339,25 @@ one to one correspondence to the C code in version 4.
 
 Here is the same program written in ARM V8 assembly language.
 
-![Version 5](./v5.png)
+```asm
+    .global main                                                        // 1 
+main:                                                                   // 2 
+    stp     x21, x30, [sp, -16]!    // push onto stack                  // 3 
+    mov     x21, x1                 // argc -> x0, argv -> x1           // 4 
+                                                                        // 5 
+top:                                                                    // 6 
+    ldr     x0, [x21], 8            // argv++, old value in x0          // 7 
+    cbz     x0, bottom              // if *argv == NULL goto bottom     // 8 
+    bl      puts                    // puts(*argv)                      // 9 
+    b       top                     // goto top                         // 10 
+                                                                        // 11 
+bottom:                                                                 // 12 
+    ldp     x21, x30, [sp], 16      // pop from stack                   // 13 
+    mov     x0, xzr                 // return 0                         // 14 
+    ret                                                                 // 15 
+                                                                        // 16 
+    .end                                                                // 17 
+```
 
 Get your bearings by noticing the labels. They are the same as in our previous
 version and perform the same roles.
@@ -353,7 +371,6 @@ Without `Line 1`, building the executable will fail with an unresolved symbol er
 ### Line 2
 
 In `Line 1` we told the assembler to publish the location of the label `main`. In `Line 2` we're actually specifying the value of `main`. Contrast `main` with `top` and `bottom`. The difference between them is that only `main` is made visible outside this source code. Again, in the case of `main`, the label must be specified as `global` so that the linker will find it. `top` and `bottom` are also labels but they are not published outside this one source file.
-
 
 ### Line 3
 
@@ -382,7 +399,7 @@ The *stack* is a region of memory used to store local variables as well as the t
 
 `x21` is also being saved on the stack. *Calling conventions* specify some registers can be blown away (used as scratch) while some registers must be preserved and restored to their previous values upon leaving the function. `x21` will be used in `main` so its original value must be preserved.
 
-Finally let's look at `[sp, -16]!`. There's a lot going on here. 
+Finally let's look at `[sp, -16]!`. There's a lot going on here.
 
 First, the `[` and `]` serve the same purpose of the asterisk in C and C++ indicating "dereference." It means use what's inside the brackets as an address. Next, `sp` means use the stack pointer - a register which keeps track of where your stack currently is,. The `-16` subtracts 16 from the current value of the stack register. `x` registes like `x21` and `x30` are each 8 bytes (64 bits) wide. This accounts for the value 16 (i.e. 2 \* 8). Lastly, the exclamation point means that the stack pointer should be changed (i.e. the -16 applied to it) before the value of the stack pointer is used as the address in memory to which the registers will be copied.
 
