@@ -30,11 +30,31 @@ Here is the code to a program which prints to the console the contents
 of `argv`, that is: the command line arguments specified when the
 program is run from the shell.
 
-![./v1.png](./v1.png)
+```c++
+#include <iostream>                                                     // 1 
+                                                                        // 2 
+using namespace std;                                                    // 3 
+                                                                        // 4 
+int main(int argc, char * argv[]) {                                     // 5 
+    while (*argv) {                                                     // 6 
+        cout << *(argv++) << endl;                                      // 7 
+    }                                                                   // 8 
+    return 0;                                                           // 9 
+}                                                                       // 10
+```
+
+[Here](./v1.cpp) is a link to the program without line numbers.
 
 Here is the output of this program:
 
-![./output.png](./output.png)
+```text
+% ./a.out one two "three plus four"
+./a.out
+one
+two
+three plus four
+% 
+```
 
 ### Line 1
 
@@ -205,7 +225,22 @@ The `0` is the program's return code.
 
 Here is version 2 of our program:
 
-![Version 2](./v2.png)
+```c++
+#include <iostream>                                                     // 1 
+                                                                        // 2 
+using namespace std;                                                    // 3 
+                                                                        // 4 
+int main(int argc, char * argv[]) {                                     // 5 
+    top:                                                                // 6 
+        if (*argv) {                                                    // 7 
+            cout << *(argv++) << endl;                                  // 8 
+            goto top;                                                   // 9 
+        }                                                               // 10 
+    return 0;                                                           // 11 
+}                                                                       // 12 
+```
+
+[Here](./v2.cpp) is the original file.
 
 In this version, we've moved a bit closer to assembly language by eliminating
 the `while` loop replacing it with an `if` statement, a `label` and a `goto`.
@@ -235,7 +270,18 @@ of the use of `cout` - namely the printing out of what is pointed to by
 
 At this point, there is no C++ left - only C.
 
- ![Version 3](./v3.png)
+ ```c++
+ #include <stdio.h>                                                      // 1 
+                                                                         // 2 
+int main(int argc, char * argv[]) {                                     // 3 
+    top:                                                                 // 4 
+        if (*argv) {                                                     // 5 
+            puts(*(argv++));                                             // 6 
+            goto top;                                                    // 7 
+        }                                                                // 8 
+    return 0;                                                            // 9 
+}                                                                       // 10 
+```
 
 ### Line 6
 
@@ -255,7 +301,20 @@ eliminate the braces that were part of the previous version's `if` statement.
 In general, braces in the higher level language serve as either branches or
 as labels.
 
-![Version 4](./v4.png)
+```c
+#include <stdio.h>                                                      /* 1 */
+                                                                        /* 2 */
+int main(int argc, char * argv[]) {                                     /* 3 */
+    top:                                                                /* 4 */
+        if (*argv == NULL)                                              /* 5 */
+            goto bottom;                                                /* 6 */
+        puts(*(argv++));                                                /* 7 */
+        goto top;                                                       /* 8 */
+                                                                        /* 9 */
+    bottom:                                                             /* 10 */
+        return 0;                                                       /* 11 */
+}                                                                       /* 12 */
+```
 
 ### Line 5
 
