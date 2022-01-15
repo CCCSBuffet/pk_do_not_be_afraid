@@ -6,21 +6,89 @@ The total size of a struct may be rounded upward so that the first member will l
 
 Here are some examples:
 
-![examples](./struct01.png)
+```c++
+#include <iostream>                                                             // 1 
+                                                                                // 2 
+using namespace std;                                                            // 3 
+                                                                                // 4 
+struct Foo                                                                      // 5 
+{                                                                               // 6 
+    uint32_t a_32_bit_int;                                                      // 7 
+    uint64_t a_64_bit_int;                                                      // 8 
+    uint16_t a_16_bit_int;                                                      // 9 
+    uint32_t a_final_32_bit_int;                                                // 10 
+};                                                                              // 11 
+                                                                                // 12 
+struct Bar                                                                      // 13 
+{                                                                               // 14 
+    uint32_t a_32_bit_int;                                                      // 15 
+    uint32_t a_final_32_bit_int;                                                // 16 
+    uint64_t a_64_bit_int;                                                      // 17 
+    uint16_t a_16_bit_int;                                                      // 18 
+};                                                                              // 19 
+                                                                                // 20 
+struct Billy                                                                    // 21 
+{                                                                               // 22 
+    uint8_t    a_char_01;                                                       // 23 
+    uint16_t a_16_bit_int;                                                      // 24 
+    uint8_t a_char_02;                                                          // 25 
+    uint8_t a_char_03;                                                          // 26 
+};                                                                              // 27 
+                                                                                // 28 
+int main()                                                                      // 29 
+{                                                                               // 30 
+    struct Foo f;                                                               // 31 
+    struct Bar b;                                                               // 32 
+    struct Billy y;                                                             // 33 
+                                                                                // 34 
+    cout << "sizeof(Foo):   " << sizeof(Foo) << endl;                           // 35 
+    cout << "Member:        Offset:\n";                                         // 36 
+    cout << "a_32_bit_int   " << (long)&f.a_32_bit_int - (long)&f << endl;      // 37 
+    cout << "a_64_bit_int   " << (long)&f.a_64_bit_int - (long)&f << endl;      // 38 
+    cout << "a_16_bit_int   " << (long)&f.a_16_bit_int - (long)&f << endl;      // 39 
+    cout << "a_32_bit_int   " << (long)&f.a_final_32_bit_int - (long)&f << endl << endl; // 40 
+                                                                                // 41 
+    cout << "sizeof(Bar):   " << sizeof(Bar) << endl;                           // 42 
+    cout << "Member:        Offset:\n";                                         // 43 
+    cout << "a_32_bit_int   " << (long)&b.a_32_bit_int - (long)&b << endl;      // 44 
+    cout << "a_32_bit_int   " << (long)&b.a_final_32_bit_int - (long)&b << endl;// 45 
+    cout << "a_64_bit_int   " << (long)&b.a_64_bit_int - (long)&b << endl;      // 46 
+    cout << "a_16_bit_int   " << (long)&b.a_16_bit_int - (long)&b << endl << endl; // 47 
+                                                                                // 48 
+    cout << "sizeof(Billy): " << sizeof(Billy) << endl;                         // 49 
+    return 0;                                                                   // 50 
+}                                                                               // 51 
+```
 
 Looking at `Foo`, one might expect `a_64_bit_int` to start at offset 4. After all, `a_32_bit_int` is 4 bytes.
 
 Here is the output produced by the above program. You'll see some unexpected values:
 
-![output](./struct02.png)
+```text
+sizeof(Foo):   24                                                       // 1 
+Member:        Offset:                                                  // 2 
+a_32_bit_int   0                                                        // 3 
+a_64_bit_int   8                                                        // 4 
+a_16_bit_int   16                                                       // 5 
+a_32_bit_int   20                                                       // 6 
+                                                                        // 7 
+sizeof(Bar):   24                                                       // 8 
+Member:        Offset:                                                  // 9 
+a_32_bit_int   0                                                        // 10 
+a_32_bit_int   4                                                        // 11 
+a_64_bit_int   8                                                        // 12 
+a_16_bit_int   16                                                       // 13 
+                                                                        // 14 
+sizeof(Billy): 6                                                        // 15 
+```
 
 `Line 4` shows `a_64_bit_int` starts at offset 8 rather than 4. This is because the natural alignment of an 8 byte value is on addresses that are divisible by 8.
 
-## The First Rule of Working with `Structs`
+## The First Rule of Working with `structs`
 
 The first rules of working with structs is that you must be sure of the offset of each data member from the beginning of the `struct`. You might need to go so far as writing a program to dump offsets just as we did above.
 
-## After That, It's Easy
+## After That, It's Relatively Easy
 
 Once you are certain of the offsets of each data member, using structs in assembly language becomes quite straight forward. A data member can be found at the address corresponding to the data member's offset from the beginning of the struct.
 
@@ -28,7 +96,26 @@ Once you are certain of the offsets of each data member, using structs in assemb
 
 Let's implement this program:
 
-![example](./struct03.png)
+```c
+#include <stdio.h>                                                      /* 1 */
+#include <string.h>                                                     /* 2 */
+                                                                        /* 3 */
+struct Foo                                                              /* 4 */
+{                                                                       /* 5 */
+    long  a;    // 0  length 8                                          /* 6 */
+    int      b;    // 8  length 4                                       /* 7 */
+    short c;    // 12 length 2                                          /* 8 */
+    char  d;    // 14 length 1                                          /* 9 */
+};                                                                      /* 10 */
+                                                                        /* 11 */
+int main()                                                              /* 12 */
+{                                                                       /* 13 */
+    struct Foo foo;                                                     /* 14 */
+    memset((void *) &foo, 0, sizeof(struct Foo));                       /* 15 */
+    printf("a: %ld b: %d c: %hd d: %d\n", foo.a, foo.b, foo.c, (int) foo.d); /* 16 */
+    return 0;                                                           /* 17 */
+}                                                                       /* 18 */
+```
 
 The `struct` has four data members in each of the common integer sizes. `Line 14` allocates a `struct` as a local variable. We will see that local variables are stored on the *stack*.
 
@@ -44,9 +131,47 @@ The final `char` will be cast as an `int`.
 
 Here is an assembly language version of the same program.
 
-![example](./struct04.png)
+```asm
+        .global main                                                    // 1 
+        .align  2                                                       // 2 
+        .text                                                           // 3 
+                                                                        // 4 
+        .equ    _A, 0                                                   // 5 
+        .equ    _B, 8                                                   // 6 
+        .equ    _C, 12                                                  // 7 
+        .equ    _D, 14                                                  // 8 
+        .equ    _Z, 16                                                  // 9 
+                                                                        // 10 
+main:                                                                   // 11 
+        stp     x29, x30, [sp, -16]!                                    // 12 
+        str     x20, [sp, -16]!                                         // 13 
+        sub     sp, sp, 16                                              // 14 
+        mov     x20, sp                                                 // 15 
+                                                                        // 16 
+        mov     x0, x20                                                 // 17 
+        mov     w1, wzr                                                 // 18 
+        mov     x2, _Z                                                  // 19 
+        bl      memset                                                  // 20 
+                                                                        // 21 
+        ldr     x0, =fmt                                                // 22 
+        ldr     x1, [x20, _A]                                           // 23 
+        ldr     w2, [x20, _B]                                           // 24 
+        ldrh    w3, [x20, _C]                                           // 25 
+        ldrb    w4, [x20, _D]                                           // 26 
+        bl      printf                                                  // 27 
+                                                                        // 28 
+        add     sp, sp, 16                                              // 29 
+        ldr     x20, [sp], 16                                           // 30 
+        ldp     x29, x30, [sp], 16                                      // 31 
+        mov     x0, xzr                                                 // 32 
+        ret                                                             // 33 
+                                                                        // 34 
+        .data                                                           // 35 
+fmt:    .asciz  "a: %ld b: %d c: %hd d: %d\n"                           // 36 
+        .end                                                            // 37 
+```
 
-`Lines 1` to `Line 10` contain assembler *directives*. These are commands to the assembler, not code to be assembled.
+`Lines 1` to `Line 9` contain assembler *directives*. These are commands to the assembler, not code to be assembled.
 
 `Line 1` instructs the assembler to expose the symbol `main` to the linker. Without this directive, the linker will not be able to find `main` so the program will not link.
 
