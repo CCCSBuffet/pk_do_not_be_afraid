@@ -1,6 +1,6 @@
 # Function Calls and Returns
 
-Calling functions, passing them parameters and receiving back return values is basic to using `C` and and `C++`. Calling methods (which are functions connected to classes) is similar but with enough differences to warrant its own discussion to be provided later in the chapter on [structs](./structs.md).
+Calling functions, passing them parameters and receiving back return values is basic to using `C` and and `C++`. Calling methods (which are functions connected to classes) is similar but with enough differences to warrant its own discussion to be provided later in the chapter on [structs](../struct/structs.md).
 
 ## Bottom Line Concept
 
@@ -12,21 +12,31 @@ The name of a (non-inline) function ultimately becomes a label to which a branch
 
 In `C`, here is the most trivial function possible:
 
-![func02](./func02.png)
+```c
+void func()
+{
+}
+```
 
 The function `func()` takes no parameters, does nothing and returns nothing.
 
 Here it is in assembly language.
 
-![func01](./func01.png)
+```asm
+func: ret
+```
 
 To call this function in `C` you would do this:
 
-![func03](./func03.png)
+```c
+   func();
+```
 
-This would be done in this way in assembly language:
+This would be done this way in assembly language:
 
-![func04](./func04.png)
+```asm
+   bl func
+```
 
 Notice that calling a function **is** a branch. But it is a special branch instruction - *branch with link*. It is the *link* that allows the function to `ret`urn.
 
@@ -40,11 +50,19 @@ Up to 8 parameters are passed in the scratch registers (of which there are 8). T
 
 For example:
 
-![func05](./func05.png)
+```c
+long func(long p1, long p2)                                             // 1 
+{                                                                       // 2 
+    return p1 + p2;                                                     // 3 
+}                                                                       // 4 
+```
 
 is implemented as:
 
-![func06](./func06.png)
+```asm
+func:   add x0, x0, x1                                                  // 1 
+        ret                                                             // 2 
+```
 
 The first parameter (`p1`) goes in the first scratch register (`x0`). It's `x` because it is a `long int` and its `0` because that is the first scratch register.
 
@@ -62,7 +80,12 @@ A pointer is an address. The word *pointer* is scary. The words *address of* isn
 
 Here is a function which *also* adds two parameters together but this time using pointers to `long int` rather than the values themselves.
 
-![func07](./func07.png)
+```c
+void func(long * p1, long * p2)                                         // 1 
+{                                                                       // 2 
+    *p1 = *p1 + *p2;                                                    // 3 
+}                                                                       // 4 
+```
 
 `Line 1` passes the *address of* `p1` and `p2` as parameters. That is, the addresses of `p1` and `p2` are passed in registers `x0` and `x1` rather than their contents. Their contents still reside in memory.
 
@@ -70,7 +93,13 @@ Here is a function which *also* adds two parameters together but this time using
 
 Here it is in assembly language:
 
-![func08](./func08.png)
+```asm
+func:   ldr x2, [x0]                                                    // 1 
+        ldr x3, [x1]                                                    // 2 
+        add x2, x2, x3                                                  // 3 
+        str x2, [x0]                                                    // 4 
+        ret                                                             // 5 
+```
 
 The `add` instruction cannot operate on values in memory. With little exception, all the *action* takes place in registers, not memory.
 
@@ -101,7 +130,12 @@ So, as the smart *human*, we decided to use `x2` and `x3` because, well, they're
 
 Suppose we had:
 
-![func09](./func09.png)
+```c++
+long func(const long p1, const long p2)                                 // 1 
+{                                                                       // 2 
+    return p1 + p2;                                                     // 3 
+}                                                                       // 4 
+```
 
 how would the assembly language change?
 
@@ -113,7 +147,12 @@ Answer: no change at all!
 
 Suppose we had:
 
-![func10](./func10.png)
+```c++
+long func(long & p1, long & p2)                                         // 1 
+{                                                                       // 2 
+    return p1 + p2;                                                     // 3 
+}                                                                       // 4 
+```
 
 how would the assembly language change?
 
