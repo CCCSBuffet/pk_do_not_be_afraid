@@ -14,7 +14,31 @@ Additionally, the example program demonstrates passing the address of a `struct`
 
 ## Our `C` Program
 
-![c program](./inter01.png)
+```c
+#include <stdio.h>                                                      /* 1 */
+                                                                        /* 2 */
+struct Foo                                                              /* 3 */
+{                                                                       /* 4 */
+    int x;                                                              /* 5 */
+    int y;                                                              /* 6 */
+};                                                                      /* 7 */
+                                                                        /* 8 */
+extern void TestAsm(struct Foo *);                                      /* 9 */
+                                                                        /* 10 */
+void Test(struct Foo * f)                                               /* 11 */
+{                                                                       /* 12 */
+    f->x = f->y = 99;                                                   /* 13 */
+}                                                                       /* 14 */
+                                                                        /* 15 */
+int main()                                                              /* 16 */
+{                                                                       /* 17 */
+    struct Foo foo;                                                     /* 18 */
+                                                                        /* 19 */
+    TestAsm(&foo);                                                      /* 20 */
+    printf("%d %d\n", foo.x, foo.y);                                    /* 21 */
+    return 0;                                                           /* 22 */
+}                                                                       /* 23 */
+```
 
 The actual code is [here](../struct/test.c).
 
@@ -36,7 +60,22 @@ Foreshadowning how to interoperate with `C++` `line 9` is the only line that wou
 
 ## Our Assembly Language Function
 
-![assembler function](./inter02.png)
+```asm
+        .global    TestAsm                                              // 1 
+        .data                                                           // 2 
+        .struct 0                                                       // 3 
+foo.x:  .skip   4                                                       // 4 
+foo.y:  .skip   4                                                       // 5 
+                                                                        // 6 
+        .text                                                           // 7 
+TestAsm:                                                                // 8 
+        mov     w1, 99                                                  // 9 
+        str     w1, [x0, foo.x]                                         // 10 
+        str     w1, [x0, foo.y]                                         // 11 
+        ret                                                             // 12 
+                                                                        // 13 
+        .end                                                            // 14 
+```
 
 The actual code is [here](../struct/testasm.s)
 
