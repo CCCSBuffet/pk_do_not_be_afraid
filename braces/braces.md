@@ -32,7 +32,14 @@ In a `while` loop, the opening brace works just like the `if` statement. The clo
 
 Recall:
 
-![if](./if01s.png)
+```asm
+    // Assume value of a is in x0                                       // 1 
+    // Assume value of b is in x1                                       // 2 
+    cmp     x0, x1                                                      // 3 
+    ble     1f                                                          // 4 
+    // CODE BLOCK                                                       // 5 
+1:                                                                      // 6 
+```
 
 The location of the opening brace "is" immediately before `line 5`. The location of the closing brace "is" immediately after `line 5`. In short, where the braces *would* be is surrounding the code block.
 
@@ -42,6 +49,16 @@ Notice that after the location of where the closing brace would be, a label is f
 
 Recall:
 
-![while](./while01s.png)
+```asm
+    // Assume value of a is in x0                                       // 1 
+    // Assume value of b is in x1                                       // 2 
+                                                                        // 3 
+ 1: cmp     x0, x1                                                      // 4 
+    ble     2f                                                          // 5 
+    // CODE BLOCK                                                       // 6 
+    b       1b                                                          // 7 
+                                                                        // 8 
+2:                                                                      // 9 
+```
 
 The opening brace "comes" immediately before `line 6`. The closing brace shows up as the branch on `line 7`. Again, there is a label immediately after where the closing brace would be so that the branch on `line 5` can skip over the code block implementing the body of the `while` loop.
