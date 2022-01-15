@@ -87,15 +87,61 @@ Now let's add a `continue` to the code block, dividing it in two.
 
 Here is what we would need to write to support a `continue` if the "conventional" ordering were used with the decision evaluation at the top:
 
-![for s](./for06s.png)
+```asm
+    // Assume i is implemented using x0                                 // 1 
+                                                                        // 2 
+    mov x0, xzr                                                         // 3 
+                                                                        // 4 
+1:  cmp x0, 10                                                          // 5 
+    bge 3f                                                              // 6 
+                                                                        // 7 
+    // FIRST PART OF CODE BLOCK                                         // 8 
+                                                                        // 9 
+    // if (i == 5)                                                      // 10 
+    //      continue                                                    // 11 
+                                                                        // 12 
+    cmp x0, 5                                                           // 13 
+    beq 2f                                                              // 14 
+                                                                        // 15 
+    // REMAINDER OF CODE BLOCK                                          // 16 
+                                                                        // 17 
+2:  add x0, x0, 1                                                       // 18 
+    b   1b                                                              // 19 
+                                                                        // 20 
+3:                                                                      // 21
+```
+
+[Here](./for05.s) is the original code.
 
 Below, is how a `for` loop is **typically** implemented.
 
-![for s](./for05s.png)
+```asm
+    // Assume i is implemented using x0                                 // 1 
+                                                                        // 2 
+    mov x0, xzr                                                         // 3 
+    b   3f                                                              // 4 
+                                                                        // 5 
+1:                                                                      // 6 
+                                                                        // 7 
+    // FIRST PART OF CODE BLOCK                                         // 8 
+                                                                        // 9 
+    // if (i == 5)                                                      // 10 
+    //      continue                                                    // 11 
+                                                                        // 12 
+    cmp x0, 5                                                           // 13 
+    beq 2f                                                              // 14 
+                                                                        // 15 
+    // REMAINDER OF CODE BLOCK                                          // 16 
+                                                                        // 17 
+2:  add x0, x0, 1                                                       // 18 
+3:  cmp x0, 10                                                          // 19 
+    blt 1b                                                              // 20 
+```
+
+[Here](./for06.s) is the original code.
 
 Once again, the code moving the post step and decision evaluation to the bottom is one fewer instruction inside the loop.
 
 ## Summary
 
-`for` loops typically contain code ordering different from what one might expect. This is done to save an instruction. While this doesn't sound like much, consider the case where the loop is executed billions of times. In this case, saving one instruction per loop prevents the execution of a billion instructions.
-The shorter the code block is, the more important it is to save one instruction from within the loop.
+`for` loops typically contain code ordering different from what one might expect. This is done to save an instruction within the loop. While this doesn't sound like much, consider the case where the loop is executed billions of times. In this case, saving one instruction per loop prevents the execution of a billion instructions. The shorter the code block is, the more important it is to save one instruction from within the loop.
