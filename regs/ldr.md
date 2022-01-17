@@ -4,6 +4,8 @@
 
 In this section we will review the `ldr` family of instructions. By extension, this section covers `ldp` and the `str` instructions indirectly.
 
+Several example programs will be presented.
+
 ## Loading Data From RAM into Registers
 
 The instructions most commonly used to retrieve information from memory are `ldr` and `ldp`. The characters `ld` in these mnemonics bring to mind `load`. `ldr` is "load a register" while `ldp` is "load a pair of registers".
@@ -323,9 +325,9 @@ FindOldestPerson:                                                       // 13
         cmp     w2, w5              // compare to oldest_age            // 23 
         csel    w2, w2, w5, gt      // update based on cmp              // 24 
         csel    x0, x0, x3, gt      // update based on cmp              // 25 
-9:      add     x3, x3, 24          // increment loop ptr               // 26 
+        add     x3, x3, 24          // increment loop ptr               // 26 
 10:     cmp     x3, x4              // has loop ptr reached end_ptr?    // 27 
-        ble     1b                  // no, not yet                      // 28 
+        blt     1b                  // no, not yet                      // 28 
                                                                         // 29 
 99:     ret                                                             // 30 
                                                                         // 31 
@@ -365,6 +367,8 @@ Recall that registers 0 through 7 are scratch registers and do not have to be ba
 
 says "Check `x0`. If it is zero, branch forward to temporary lable 99." The `cbz` mnemonic means "compare and branch if zero." There is also a `cbnz` instruction branching if not zero.
 
+The `cbz` and `cbnz` instructions exist because testing against zero is so common.
+
 This instruction is the same as:
 
 ```asm
@@ -372,10 +376,62 @@ This instruction is the same as:
         beq    99f
 ```
 
-This instruction exists because testing against zero is so common.
+We did not choose the value 99 at random. This line was written at a time when we did not yet know what other temporary labels we might be needing. 99 is a large number that we would be unlikely to run into with other temporary labels. You might establish the habit of using a value like 99 to be your favorite value for the last label in a function.
 
 `Line 14` implements ``line 18` of the `C` code. The closing brace found on `line 30` of the `C` code is implemented on `line 30` of the assembly language code. A coincidence, surely.
 
 `Line 15` establishes the oldest age found so far as being 0.
 
-**LEFT OFF HERE**
+`Line 16` copies the base address of the array to `x3` from `x0`. The value arrives in `x0` because it is the first parameter to the function. It must be an `x` register because it is a pointer. 
+
+We need a pointer to march through the array. `x0` serves double duty as holding the first parameter but also as the place where function return values are found. We copy `x0` out to `x3` so that we can use `x0` to store a pointer to the array element representing the oldest person found so far. If we iterated over the array using `x0`, we would still a) need another `x` register to hold the pointer to the oldest person so far and b) have to copy this register to `x0` before we return anyway. Doing the marching through the array is a register *other* than `x0` saves us one instruction.
+
+`Line 17` initializes `x0` after we've preserved its value in `x3`.
+
+`Line 18` puts the value of 24 into `w5`. This register is used for scratch or intermediate calculation purposes. We're setting up the calculation which ends with the pointer to just beyond the end of the array. The size of the `struct Person` is 24 bytes (not 20). We considered allowing the assembler to compute this for us but chose instead of hard code the value.
+
+`Line 19` is a mouthful. The mnemonic `smaddl` means *signed multiply add long*. Here is the instruction:
+
+```asm
+        smaddl  x4, w1, w5, x3      // initialize end_ptr               // 19 
+```
+
+`w1` (the length) will be multipled by `w5` (the size of each array member), added to `x3` (the base address of the array) and the result will be placed into `x4`. This assembly language instruction implements this:
+
+```c
+        struct Person * end_ptr = people + length;                      /* 20 */
+```
+
+`Line 20` branches to the `while` loop's decision test. Putting the decision test of a loop at the loop's bottom rather than the top has previously been shown to save one instruction.
+
+`Line 22` begins the main loop of this function. `w5` is loaded with the `int` found 16 bytes away from the address pointed to by `x3`. In this case, we allowed the assembler to compute the 16 for us - you can see this on `lines 33` through `37`. A `w` register is used because `age` is an `int`.
+
+`Line 23` compares the current age to the largest age found so far. This is a key line in that the `cmp` sets *status bits* which are used by the next two, very cool, instructions.
+
+`Line 24` and `25` both make use of the `csel` instruction. The mnemonic means "conditional select". The comparison **has already been made** (on `line 23`) setting the CPU's status bits recording if the comparison resulted in a less than zero, zero, or more than zero result.
+
+`Lines 24` and `25` read:
+
+```asm
+        csel    w2, w2, w5, gt      // update based on cmp              // 24 
+        csel    x0, x0, x3, gt      // update based on cmp              // 25 
+```
+
+These are identical to this:
+
+```c
+        w2 = (w5 > w2) ? w5 : w2;
+        x0 = (x3 > x0) ? x3 : x0;
+```
+
+Remember that the condition or status bits have already been set based upon whether or not the current age is greater than (or equal to) the oldest age found so far. Both of the `csel` instructions leverage the outcome of the comparison, done just once.
+
+`csel`, like the `C` and `C++` ternary operator, is quite cool in that we get the results of an `if` statement without the overhead of branching instructions!
+
+`Line 26` increments the loop pointer to the next array member or to the end of the array.
+
+`Line 27` compares the new value of the loop pointer to the address coming after the array.
+
+`Line 28` will branch to the next iteration of the loop if `x3` has not yet advanced as far as `x4` sitting past the end of the array.
+
+`Line 30` is simply a `ret` because the value we want to return has been sitting in `x0` all along!
