@@ -23,9 +23,9 @@ FindOldestPerson:
         cmp     w2, w5              // compare to oldest_age
     	csel	w2, w2, w5, gt      // update based on cmp
         csel	x0, x0, x3, gt      // update based on cmp
-9:      add     x3, x3, 24          // increment loop ptr
+        add     x3, x3, 24          // increment loop ptr
 10:     cmp     x3, x4              // has loop ptr reached end_ptr?
-        ble     1b                  // no, not yet
+        blt     1b                  // no, not yet
 
 99:     ret
 
