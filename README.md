@@ -42,7 +42,9 @@ All the action happens in the registers. Bottom line is that the variables you a
 
 | Chapter | Description |
 | ------- | ----------- |
-| [Registers Versus Variables](./regs/regs.md) | Thinking differently about your variables |
+| [Concept of Registers](./regs/regs.md) | What are registers |
+| [`ldr`](./regs/ldr.md) | Review and amplification of the `ldr` instructions and by extension, the `str` instructions |
+| [Registers Versus Variables]() | Thinking differently about your variables - not written |
 | Register Widths | Not written |
 | Floating Point Registers | No written |
 | Scratch Registers | Not written |
