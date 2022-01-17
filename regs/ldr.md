@@ -98,6 +98,13 @@ Notice we don't use an index variable any longer. Instead, we use the pointer it
 
 `values` begins as the address of the first `long` in the array. On `line 4` we leverage *address arithmetic* to determine where to stop. `end` gets the address of the `long` just beyond the end of the array. When we get there, we stop.
 
+This approach, which avoids the overhead of a loop variable, works well in both `C` and `C++`. It is similar in spirit to this in `C++`:
+
+```c++
+    vector<Foo> foov;
+    for (auto it = foov.begin(); it < foov.end(); it++)
+```
+
 Here is a hand translation of the above `C` code:
 
 ```asm
@@ -217,7 +224,7 @@ SillyMove16:
     ret
 ```
 
-As an interesting aside, remember the `q` registers?
+As an interesting aside, remember the `q` registers? They are 16 bytes wide by themselves.
 
 ```asm
 SillyMove16:
@@ -225,3 +232,150 @@ SillyMove16:
     str    q2, [x1]
     ret
 ```
+
+### Indexing Through An Array of `struct`
+
+Here is a more realistic case study. Given this:
+
+```c
+#include <stdio.h>                                                      /* 1 */
+                                                                        /* 2 */
+struct Person                                                           /* 3 */
+{                                                                       /* 4 */
+    char * fname;                                                       /* 5 */
+    char * lname;                                                       /* 6 */
+    int age;                                                            /* 7 */
+};                                                                      /* 8 */
+                                                                        /* 9 */
+extern int rand();                                                      /* 10 */
+extern struct Person * FindOldestPerson(struct Person *, int);          /* 11 */
+                                                                        /* 12 */
+struct Person * OriginalFindOldestPerson(struct Person * people, int length) /* 13 */
+{                                                                       /* 14 */
+    int oldest_age = 0;                                                 /* 15 */
+    struct Person * oldest_ptr = NULL;                                  /* 16 */
+                                                                        /* 17 */
+    if (people)                                                         /* 18 */
+    {                                                                   /* 19 */
+        struct Person * end_ptr = people + length;                      /* 20 */
+        while (people < end_ptr)                                        /* 21 */
+        {                                                               /* 22 */
+            if (people->age > oldest_age)                               /* 23 */
+            {                                                           /* 24 */
+                oldest_age = people->age;                               /* 25 */
+                oldest_ptr = people;                                    /* 26 */
+            }                                                           /* 27 */
+            people++;                                                   /* 28 */
+        }                                                               /* 29 */
+    }                                                                   /* 30 */
+    return oldest_ptr;                                                  /* 31 */
+}                                                                       /* 32 */
+                                                                        /* 33 */
+#define LENGTH  20                                                      /* 34 */
+                                                                        /* 35 */
+int main()                                                              /* 36 */
+{                                                                       /* 37 */
+    struct Person array[LENGTH];                                        /* 38 */
+    for (int i = 0; i < LENGTH; i++)                                    /* 39 */
+    {                                                                   /* 40 */
+        array[i].age = rand() & 5000;                                   /* 41 */
+    }                                                                   /* 42 */
+    struct Person * oldest = FindOldestPerson(array, LENGTH);           /* 43 */
+    for (int i = 0; i < LENGTH; i++)                                    /* 44 */
+    {                                                                   /* 45 */
+        printf("%d", array[i].age);                                     /* 46 */
+        if (oldest == &array[i])                                        /* 47 */
+            printf("*");                                                /* 48 */
+        printf("\n");                                                   /* 49 */
+    }                                                                   /* 50 */
+}                                                                       /* 51 */
+```
+
+`FindOldestPerson()` will march through the array of `struct Person` to find the oldest individual returning a pointer to that `struct`. In case of a tie, the first person found will be returned. The array is checked against `NULL` and if found to be so, `NULL` is returned.
+
+`gcc` with `-O2` or `-O3` optimization rendered `OriginalFindOldestPerson()` into 18 lines of assembly language.
+
+This example is more "real world" in that it offers us the chance to work with `w` registers (`int`). It also demonstrates `csel` which is like the `C` and `C++` `ternary operator`.
+
+```asm
+        .global FindOldestPerson                                        // 1 
+        .text                                                           // 2 
+        .align  2                                                       // 3 
+                                                                        // 4 
+//  x0  has struct Person * people                                      // 5 
+//      will be used for oldest_ptr as this is the return value         // 6 
+//  w1  has int length                                                  // 7 
+//  w2  used for oldest_age                                             // 8 
+//  x3  used for Person *                                               // 9 
+//  x4  used for end_ptr                                                // 10 
+//  w5  used for scratch                                                // 11 
+                                                                        // 12 
+FindOldestPerson:                                                       // 13 
+        cbz     x0, 99f             // short circuit                    // 14 
+        mov     w2, wzr             // initial oldest age is 0          // 15 
+        mov     x3, x0              // initialize loop pointer          // 16 
+        mov     x0, xzr             // initialize return value          // 17 
+        mov     w5, 24              // struct is 24 bytes wide          // 18 
+        smaddl  x4, w1, w5, x3      // initialize end_ptr               // 19 
+        b       10f                 // enter loop                       // 20 
+                                                                        // 21 
+1:      ldr     w5, [x3, p.age]     // fetch loop ptr -> age            // 22 
+        cmp     w2, w5              // compare to oldest_age            // 23 
+        csel    w2, w2, w5, gt      // update based on cmp              // 24 
+        csel    x0, x0, x3, gt      // update based on cmp              // 25 
+9:      add     x3, x3, 24          // increment loop ptr               // 26 
+10:     cmp     x3, x4              // has loop ptr reached end_ptr?    // 27 
+        ble     1b                  // no, not yet                      // 28 
+                                                                        // 29 
+99:     ret                                                             // 30 
+                                                                        // 31 
+        .data                                                           // 32 
+        .struct 0                                                       // 33 
+p.fn:   .skip   8                                                       // 34 
+p.ln:   .skip   8                                                       // 35 
+p.age:  .skip   4                                                       // 36 
+p.pad:  .skip   4                                                       // 37 
+                                                                        // 38 
+        .end                                                            // 39 
+```
+
+Before we get to the explanation, permit us a small pat on the back. The above version, written by us humans, rendered `FindOldestPerson()` in 15 lines. To be fair, the length of the tightest loop was the same at 7 lines.
+
+`Lines 5` through `11` are vitally important comments. You should always write comments like these as they will serve as your "dictionary" to help you keep track of what particular registers will be used for.
+
+`x0` begins as the pointer to `struct Person` being passed to us. `x0` is also used for returning values from a function so we'll copy `x0` to `x3` on `line 16`. This will save us an instruction later as we won't have to copy the intended return value back to `x0` prior to the `ret` on `line 30`.
+
+`w1` is passed to us as the length of the array. It is in a `w` register because we defined it as an `int`.
+
+`w2` will hold the oldest age found so far. It is a `w` register because we defined age as an `int`.
+
+`x3` is described above under `x0`.
+
+`x4` will be set to the address after the end of the array and will be used to stop our loop.
+
+`w5` is used for scratch.
+
+Recall that registers 0 through 7 are scratch registers and do not have to be backed up or restored.
+
+`Line 14` is a combination compare AND branch instruction.
+
+```asm
+       cbz     x0, 99f
+```
+
+says "Check `x0`. If it is zero, branch forward to temporary lable 99." The `cbz` mnemonic means "compare and branch if zero." There is also a `cbnz` instruction branching if not zero.
+
+This instruction is the same as:
+
+```asm
+        cmp    x0, xzr
+        beq    99f
+```
+
+This instruction exists because testing against zero is so common.
+
+`Line 14` implements ``line 18` of the `C` code. The closing brace found on `line 30` of the `C` code is implemented on `line 30` of the assembly language code. A coincidence, surely.
+
+`Line 15` establishes the oldest age found so far as being 0.
+
+**LEFT OFF HERE**
