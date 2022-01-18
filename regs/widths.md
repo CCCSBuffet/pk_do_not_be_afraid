@@ -1,0 +1,116 @@
+# Register Widths
+
+## Overview
+
+In each of the various sets of registers, each register can be referred to by different synonyms which determine how wide the register operation will be.
+
+## General Purpose Registers
+
+| Intended Width | Register Prefix | Instruction Postfix |
+| -------------- | --------------- | ------------------- |
+| 8 bytes | `x` | NA |
+| 4 bytes | `w` | NA |
+| 2 bytes | `w` | `h` |
+| 1 byte | `w` | `b` |
+
+### `ldr` (and `ldp`)
+
+```asm
+    ldr    x0, [sp]   // load 8 bytes from address specified by sp
+    ldr    w0, [sp]   // load 4 bytes from address specified by sp
+    ldrh   w0, [sp]   // load 2 bytes from address specified by sp
+    ldrb   w0, [sp]   // load 1 byte  from address specified by sp
+```
+
+The address from which a load is taking must match the alignment of what is being loaded.
+
+### `str` (and `stp`)
+
+```asm
+    str    x0, [sp]   // store 8 bytes to address specified by sp
+    str    w0, [sp]   // store 4 bytes to address specified by sp
+    strh   w0, [sp]   // store 2 bytes to address specified by sp
+    strb   w0, [sp]   // store 1 byte  to address specified by sp
+```
+
+The address to which a store is made must match the alignment of what is being stored.
+
+### Example
+
+Let's look at this program:
+
+```asm
+        .global    main                                                 // 1 
+        .text                                                           // 2 
+        .align    2                                                     // 3 
+                                                                        // 4 
+main:   mov     x0, xzr                                                 // 5 
+        ldr     x1, =ram                                                // 6 
+        strb    w0, [x1]                                                // 7 
+        strh    w0, [x1]                                                // 8 
+        str     w0, [x1]                                                // 9 
+        str     x0, [x1]                                                // 10 
+        ret                                                             // 11 
+                                                                        // 12 
+        .data                                                           // 13 
+ram:    .quad   0xFFFFFFFFFFFFFFFF                                      // 14 
+                                                                        // 15 
+        .end                                                            // 16 
+                                                                        // 17 
+```
+
+The following is a copy of a `gdb` session running the above program. Line numbers have been added to assist with the description of the session.
+
+```text
+(gdb) b main                                                            // 1 
+Breakpoint 1 at 0x740: file align.s, line 5.                            // 2 
+(gdb) run                                                               // 3 
+Starting program: /media/psf/Home/buffet/3510/pk_do_not_be_afraid/regs/a.out // 4 
+                                                                        // 5 
+Breakpoint 1, main () at align.s:5                                      // 6 
+5    main:    mov     x0, xzr                                           // 7 
+(gdb) p/x $x0                                                           // 8 
+$1 = 0x1                                                                // 9 
+(gdb) n                                                                 // 10 
+6            ldr     x1, =ram                                           // 11 
+(gdb) p/x $x0                                                           // 12 
+$2 = 0x0                                                                // 13 
+(gdb) p/x $x1                                                           // 14 
+$3 = 0xfffffffff028                                                     // 15 
+(gdb) n                                                                 // 16 
+7            strb    w0, [x1]                                           // 17 
+(gdb) p/x $x1                                                           // 18 
+$4 = 0xaaaaaaab1010                                                     // 19 
+(gdb) p/x &ram                                                          // 20 
+$5 = 0xaaaaaaab1010                                                     // 21 
+(gdb) x/x &ram                                                          // 22 
+0xaaaaaaab1010:    0xffffffff                                           // 23 
+(gdb) x/gx &ram                                                         // 24 
+0xaaaaaaab1010:    0xffffffffffffffff                                   // 25 
+(gdb) n                                                                 // 26 
+8            strh    w0, [x1]                                           // 27 
+(gdb) x/gx &ram                                                         // 28 
+0xaaaaaaab1010:    0xffffffffffffff00                                   // 29 
+(gdb) n                                                                 // 30 
+9            str     w0, [x1]                                           // 31 
+(gdb) x/gx &ram                                                         // 32 
+0xaaaaaaab1010:    0xffffffffffff0000                                   // 33 
+(gdb) n                                                                 // 34 
+10            str     x0, [x1]                                          // 35 
+(gdb) x/gx &ram                                                         // 36 
+0xaaaaaaab1010:    0xffffffff00000000                                   // 37 
+(gdb) n                                                                 // 38 
+11            ret                                                       // 39 
+(gdb) x/gx &ram                                                         // 40 
+0xaaaaaaab1010:    0x0000000000000000                                   // 41 
+(gdb) quit                                                              // 42 
+```
+
+### Other Instructions
+
+```asm
+    add    x0, x0, x1 // operate upon a long
+    add    w0, w0, w1 // operate upon an int
+    addh   w0, w0, w1 // operate upon a short
+    addb   w0, w0, w1 // operate upon a byte
+```
