@@ -198,6 +198,43 @@ Look at that... the *least significant* byte of a `long` comes **first**.
 
 This is the definition of `little endianess`.
 
+### Little Endian in More Detail
+
+Given this program:
+
+```asm
+        .global    main                                                 // 1 
+        .text                                                           // 2 
+        .align    2                                                     // 3 
+                                                                        // 4 
+main:    mov     x0, xzr                                                // 5 
+        ret                                                             // 6 
+                                                                        // 7 
+        .data                                                           // 8 
+ram:    .quad   0xAABBCCDDEEFF0011                                      // 9 
+        .end                                                            // 10 
+```
+
+let's take a look at the memory at location `ram` in two ways. Once interpreted as a `long`:
+
+```text
+(gdb) x/gx &ram
+0x11010:    0xaabbccddeeff0011
+```
+
+and then intrepreted as 8 bytes appearing in the order of lowest address to highest:
+
+```text
+(gdb) x/8bx &ram
+0x11010:    0x11    0x00    0xff    0xee    0xdd    0xcc    0xbb    0xaa
+```
+
+Compare the order of the bytes. They are least significant to most significant. Specifically:
+
+* within a `long` the least significant `int` comes first
+* within an `int`, the least significant `short` comes first
+* within a `short` the least significant byte comes first
+
 ### Other Instructions
 
 ```asm
