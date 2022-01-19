@@ -46,7 +46,7 @@ All the action happens in the registers. Bottom line is that the variables you a
 | [Registers Versus Variables](./regs/regvar.md) | Thinking differently about your variables |
 | [What Registers Must be Backed Up and Why](./regs/backup.md) | Constraints placed on register use |
 | [`ldr`](./regs/ldr.md) | Review and amplification of the `ldr` instructions and by extension, the `str` instructions - with a number of programming examples |
-| [Register Widths](./regs/widths.md) | Demonstrated with examples and an `gdb` session plus a discussion on *endianness* |
+| [Register Widths](./regs/widths.md) | Demonstrated with examples and a `gdb` session plus a discussion on *endianness* |
 | Floating Point Registers | No written |
 | Scratch Registers | Not written |
 | Push and Pop of Registers | Not written |
