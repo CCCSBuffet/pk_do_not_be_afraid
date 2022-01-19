@@ -196,11 +196,15 @@ But what if we look at these 8 bytes individually?
 
 Look at that... the *least significant* byte of a `long` comes **first**. 
 
-This is the definition of `little endianess`.
+This is the definition of `little endian`.
+
+The following image is from [here](https://medium.com/worldsensing-techblog/big-endian-or-little-endian-37c3ed008c94):
+
+![eggs](./eggs.jpeg)
 
 ### Little Endian in More Detail
 
-Given this program:
+Given this program (not intended for meaningful execution... just e`x`aminging memory):
 
 ```asm
         .global    main                                                 // 1 
@@ -235,11 +239,19 @@ Compare the order of the bytes. They are least significant to most significant. 
 * within an `int`, the least significant `short` comes first
 * within a `short` the least significant byte comes first
 
+Endiannes isn't an issue unless you're exchanging data with a computer that has a different endedness and then only if the data being transferred is longer in native width than 1 byte. Text, expressed in single bytes, is immune from endedness issues - text is an array of bytes and is the same on all platforms.
+
+### What Happens to the Rest of a Register When Only a Portion is Affected?
+
 ### Other Instructions
+
+Many other instructions operate upon different widths. For example:
 
 ```asm
     add    x0, x0, x1 // operate upon a long
     add    w0, w0, w1 // operate upon an int
-    addh   w0, w0, w1 // operate upon a short
-    addb   w0, w0, w1 // operate upon a byte
+WRONG    addh   w0, w0, w1 // operate upon a short
+WRONG    addb   w0, w0, w1 // operate upon a byte
 ```
+
+## Casting Between `int` Types
