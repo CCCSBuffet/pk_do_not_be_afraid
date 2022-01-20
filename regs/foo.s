@@ -2,5 +2,13 @@
 	.text
 	.align	2
 
-foo:	addh	w0, w1, w1
+foo:	
 	ret
+
+	.section	.rodata
+	.quad		0xff
+
+	.bss
+	.quad		0xff
+
+	.end

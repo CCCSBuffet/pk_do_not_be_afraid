@@ -20,6 +20,30 @@ To backup (or "preserve") a register is copying the register onto the stack (i.e
 
 To restore a register means copying a previously stored copy of the contents of a register from the stack (RAM) back to the register. The `ldr` and `ldp` instructions are used for this.
 
+## Always Manipulate the Stack in Multiples of 16
+
+Any change you make to `sp` must be a multiple of 16.
+
+Here is an example:
+
+```asm
+        .global main                                                    // 1 
+        .text                                                           // 2 
+        .align  2                                                       // 3 
+                                                                        // 4 
+main:   str     x30, [sp, -8]!                                          // 5 
+        ldr     x30, [sp], 8                                            // 6 
+        ret                                                             // 7 
+```
+
+which produces:
+
+```text
+regs > ./a.out
+Bus error (core dumped)
+regs >
+```
+
 ## Link Register
 
 `x30` is the Link Register, a register which is automatically used to store the return address when a function call is made (i.e. the `bl` instruction). Indeed, the `bl` instruction is called Branch with Link.
@@ -86,6 +110,10 @@ These registers are free for you to use **but** if you call other functions, you
 ## `x19` through `x28`
 
 These registers are free for you to use **but** if you modify them, you **must** preserve them.
+
+## `x8`, `x16` through `x18` and `x29`
+
+While these registers *are* general purpose registers and you *can* use them, compilers use these to facilitate certain functions they do including easing the use of a debugger. If you're flitting back and forth from assembly language to higher level languages you might think about avoiding their use. `x29` in particular is known as the `frame pointer` and is used for debugging. It will be explained in more detail elsewhere.
 
 ## Restatement
 
