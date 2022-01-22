@@ -58,3 +58,43 @@ The second way is identical to calling user-land library functions.
 
 Here is an example:
 
+```asm
+        .global main                                                    // 1 
+        .equ    O_RDONLY, 0                                             // 2 
+        .text                                                           // 3 
+        .align  2                                                       // 4 
+                                                                        // 5 
+main:   stp     x29, x30, [sp, -16]!                                    // 6 
+        str     x20, [sp, -16]!         // x20 used to buffer FD        // 7 
+                                                                        // 8 
+        ldr     x0, =fname                                              // 9 
+        mov     w1, O_RDONLY                                            // 10 
+        bl      open                    // use stub to make system call // 11 
+        cmp     w0, wzr                 // a bad return is negative     // 12 
+        blt     90f                     // if bad, skip over the good   // 13 
+                                                                        // 14 
+        mov     w20, w0                 // preserve FD                  // 15 
+        ldr     x0, =osucc              // print a success message      // 16 
+        bl      puts                                                    // 17 
+                                                                        // 18 
+        mov     w0, w20                 // restore FD                   // 19 
+        bl      close                   // use stub to make system call // 20 
+        b       99f                     // skip over else code          // 21 
+                                                                        // 22 
+90:     ldr     x0, =ofail              // print an error message       // 23 
+        bl      perror                                                  // 24 
+                                                                        // 25 
+99:     ldr     x20, [sp], 16                                           // 26 
+        ldp     x29, x30, [sp], 16                                      // 27 
+        mov     x0, xzr                                                 // 28 
+        ret                                                             // 29 
+                                                                        // 30 
+        .section    .rodata                                             // 31 
+fname:  .asciz      "syscall01.s"                                       // 32 
+ofail:  .asciz      "open failed"                                       // 33 
+osucc:  .asciz      "open succeeded"                                    // 34 
+                                                                        // 35 
+        .end                                                            // 36 
+```
+
+The above program attempts to open a file (hard coded to be the name of the source code for the program itself). The two system calls used are `open()` and `close()`. However, this code doesn't directly make the system calls but rather, calls stubs found in the runtime.

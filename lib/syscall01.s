@@ -4,23 +4,23 @@
         .align  2
 
 main:   stp     x29, x30, [sp, -16]!
-        str     x20, [sp, -16]!
+        str     x20, [sp, -16]!         // x20 used to buffer FD
 
         ldr     x0, =fname
         mov     w1, O_RDONLY
-        bl      open
-        cmp     w0, wzr
-        blt     90f
+        bl      open                    // use stub to make system call
+        cmp     w0, wzr                 // a bad return is negative
+        blt     90f                     // if bad, skip over the good
 
-        mov     w20, w0
-        ldr     x0, =osucc
+        mov     w20, w0                 // preserve FD
+        ldr     x0, =osucc              // print a success message
         bl      puts
         
-        mov     w0, w20
-        bl      close
-        b       99f
+        mov     w0, w20                 // restore FD
+        bl      close                   // use stub to make system call
+        b       99f                     // skip over else code
 
-90:     ldr     x0, =ofail
+90:     ldr     x0, =ofail              // print an error message
         bl      perror
 
 99:     ldr     x20, [sp], 16
