@@ -32,10 +32,11 @@ Some might argue this makes a strange choice of initial chapters. To many, Part 
 | [while](./while/while.md) | Demonstrates implementation of a `while` loop |
 | [for](./for/for.md) | Demonstrates implementation of a `for` loop |
 | [Function Calls and Returns](./func/func.md) | Demonstrates implementation of function calls and returns |
-| [Structs](./struct/structs.md) | Demonstrates use of `struct` and by extension, `class` |
+| [struct](./struct/structs.md) | Demonstrates use of `struct` and by extension, `class` |
 | [Braces](./braces/braces.md) | Focuses on how braces translate into assembly language |
 | [Interop](./interop/interop.md) | Calling assembly language from C and C++ |
 | [`static` and Global Variables](./static/static.md) | How `static` and global variables are defined - also an annotated `gdb` session |
+| [library functions](./lib/libs.md) | Calling `C` library functions from assembly language |
 
 ## Part 2 - Details on Registers and their Usage
 
