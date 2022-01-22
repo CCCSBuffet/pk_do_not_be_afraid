@@ -52,11 +52,11 @@ Asking the OS to perform services for us is done by making system calls.
 There are two ways of making system calls:
 
 1) making them directly
-2) making them via a stubbed proxy
+2) making them via a stubbed proxy or wrapper
 
-The second way is identical to calling user-land library functions.
+The second way is identical to calling user-land library functions and is how higher level languages make system calls.
 
-Here is an example:
+Here is an example calling a stub or user-land wrapper function:
 
 ```asm
         .global main                                                    // 1 
@@ -98,3 +98,45 @@ osucc:  .asciz      "open succeeded"                                    // 34
 ```
 
 The above program attempts to open a file (hard coded to be the name of the source code for the program itself). The two system calls used are `open()` and `close()`. However, this code doesn't directly make the system calls but rather, calls stubs found in the runtime.
+
+Here is the identical program written in deconstructed `C`:
+
+```c
+#include <stdio.h>                                                      // 1 
+#include <fcntl.h>                                                      // 2 
+                                                                        // 3 
+int main()                                                              // 4 
+{                                                                       // 5 
+    int fd = open("syscall01.s", O_RDONLY);                             // 6 
+    if (fd < 0)                                                         // 7 
+        goto err;                                                       // 8 
+                                                                        // 9 
+    puts("open succeeded");                                             // 10 
+    goto bottom;                                                        // 11 
+                                                                        // 12 
+err:                                                                    // 13 
+    perror("open failed");                                              // 14 
+                                                                        // 15 
+bottom:                                                                 // 16 
+    return 0;                                                           // 17 
+}                                                                       // 18 
+```
+
+## Crossing into Kernel Space
+
+System calls are implemented by "the system" i.e. the OS.
+
+In order to reach inside the OS there must be a transition from user-land to kernel space. This is done using a special trap instruction which on the AARCH64 ISA is `svc` (as in "service"). The user-land wrapper performs certain bookkeeping prior to causing the trap. It is the bookkeeping that will inform the OS's trap handler what service the user program is requesting.
+
+Over time, layers and layers of cruft have piled up in the Linux kernel. What started out as a system designed for simplicity (Unix) has become exactly what the creators of Unix abhored the most. To the current point, we demonstrate how the system call `close()` is actually made under the hood rather than showing `open()` which has been improved so much we'll avoid it.
+
+```asm
+        mov     w0, w20                 // restore FD into w0
+        mov     x8, 57                  // select "close"
+        svc     0                       // trap!
+        b       99f                     // skip over else code
+```
+
+Notice how `x8` is used to specify to the OS which system call we desire its help in executing. This is set up prior to calling `svc` with the value of 0.
+
+[Here](https://marcin.juszkiewicz.com.pl/download/tables/syscalls.html) is a handy site for looking up system call numbers. Whereever you see a system call number of `-1` it typically means: "*we couldn't leave well enough alone and felt compelled to put our own ego driven mark on what people smarter than us did before*."
