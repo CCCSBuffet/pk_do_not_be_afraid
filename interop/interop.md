@@ -146,5 +146,5 @@ void Bar()
 
 you will find that the symbol `Foo()` will **not** be found.
 
-Instead you will find `_Z3Fooi` and `_Z3Food`. This is called *name mangling*. Function overloading works by encoding the parameters and their types into the name of the actual function emitted rather than its unmangled name.
+Instead you will find `_Z3Fooi` and `_Z3Food`. This is called *name mangling*. Function overloading works by encoding the parameters and their types into the name of the actual function emitted rather than its unmangled name. The compiler knows which version of the overloaded function to call based upon unambiguous differences in their parameters. This is exceedingly elegant.
 
