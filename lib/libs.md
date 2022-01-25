@@ -46,6 +46,10 @@ hello, world
 lib > 
 ```
 
+### Why No Header Files?
+
+You might be wondering why we were simply able to refer to `printf()` without the need to `include` a header file. The core purpose of include files is to establish *signatures* of functions, classes, structs and external globals. Signatures are used to enforce type checking. As there is no type checking in assembly language (other than you!), header files aren't needed per se. The linker is responsible for ensuring there exists a target for every symbol.
+
 ## Making System Calls
 
 Asking the OS to perform services for us is done by making system calls.
@@ -97,7 +101,7 @@ osucc:  .asciz      "open succeeded"                                    // 34
         .end                                                            // 36 
 ```
 
-The above program attempts to open a file (hard coded to be the name of the source code for the program itself). The two system calls used are `open()` and `close()`. However, this code doesn't directly make the system calls but rather, calls stubs found in the runtime.
+The above program attempts to open a file (hard coded to be the name of the source code for the program itself). The two system calls used are `open()` and `close()`. However, this code doesn't directly make the system calls but rather, calls wrapper found in the runtime. These wrappers set up the system call by ensuring certain values are placed into certain registers before causing the transition from user land to kernel land.
 
 Here is the identical program written in deconstructed `C`:
 
@@ -137,6 +141,10 @@ Over time, layers and layers of cruft have piled up in the Linux kernel. What st
         b       99f                     // skip over else code
 ```
 
-Notice how `x8` is used to specify to the OS which system call we desire its help in executing. This is set up prior to calling `svc` with the value of 0.
+Notice how `x8` is used to specify to the OS which system call we desire its help in executing. This is set up prior to calling `svc` with the value of 0. Restated:
+
+* `svc` instruction causes a trap into the operating system
+* `0` specifies we are making a system call
+* `w8` specifies **which** system call
 
 [Here](https://marcin.juszkiewicz.com.pl/download/tables/syscalls.html) is a handy site for looking up system call numbers. Whereever you see a system call number of `-1` it typically means: "*we couldn't leave well enough alone and felt compelled to put our own ego driven mark on what people smarter than us did before*."
