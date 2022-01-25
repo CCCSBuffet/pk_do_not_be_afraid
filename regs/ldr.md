@@ -378,15 +378,17 @@ This instruction is the same as:
 
 We did not choose the value 99 at random. This line was written at a time when we did not yet know what other temporary labels we might be needing. 99 is a large number that we would be unlikely to run into with other temporary labels. You might establish the habit of using a value like 99 to be your favorite value for the last label in a function.
 
-`Line 14` implements ``line 18` of the `C` code. The closing brace found on `line 30` of the `C` code is implemented on `line 30` of the assembly language code. A coincidence, surely.
+`Line 14` implements `line 18` of the `C` code. 
+
+The closing brace found on `line 30` of the `C` code is implemented on `line 30` of the assembly language code. A coincidence, surely.
 
 `Line 15` establishes the oldest age found so far as being 0.
 
-`Line 16` copies the base address of the array to `x3` from `x0`. The value arrives in `x0` because it is the first parameter to the function. It must be an `x` register because it is a pointer. 
+`Line 16` copies the base address of the array to `x3` from `x0`. The value arrives in `x0` because it is the first parameter to the function. It must be an `x` register because it is a pointer. We need a pointer to march through the array. `x0` serves double duty as holding the first parameter but also as the place where function return values are found. 
 
-We need a pointer to march through the array. `x0` serves double duty as holding the first parameter but also as the place where function return values are found. We copy `x0` out to `x3` so that we can use `x0` to store a pointer to the array element representing the oldest person found so far. If we iterated over the array using `x0`, we would still a) need another `x` register to hold the pointer to the oldest person so far and b) have to copy this register to `x0` before we return anyway. Doing the marching through the array is a register *other* than `x0` saves us one instruction.
+We copy `x0` out to `x3` so that we can use `x0` to store a pointer to the array element representing the oldest person found so far. If we iterated over the array using `x0`, we would still a) need another `x` register to hold the pointer to the oldest person so far and b) have to copy this register to `x0` before we return anyway. Doing the marching through the array is a register *other* than `x0` saves us one instruction.
 
-`Line 17` initializes `x0` after we've preserved its value in `x3`.
+`Line 17` initializes `x0` after we've preserved its original value in `x3`.
 
 `Line 18` puts the value of 24 into `w5`. This register is used for scratch or intermediate calculation purposes. We're setting up the calculation which ends with the pointer to just beyond the end of the array. The size of the `struct Person` is 24 bytes (not 20). We considered allowing the assembler to compute this for us but chose instead of hard code the value.
 
@@ -421,10 +423,10 @@ These are identical to this:
 
 ```c
         w2 = (w5 > w2) ? w5 : w2;
-        x0 = (x3 > x0) ? x3 : x0;
+        x0 = (x5 > x2) ? x3 : x0;
 ```
 
-Remember that the condition or status bits have already been set based upon whether or not the current age is greater than (or equal to) the oldest age found so far. Both of the `csel` instructions leverage the outcome of the comparison, done just once.
+**Remember that the condition or status bits have already been set based upon whether or not the current age is greater than (or equal to) the oldest age found so far. Both of the `csel` instructions leverage the outcome of the comparison, done just once.**
 
 `csel`, like the `C` and `C++` ternary operator, is quite cool in that we get the results of an `if` statement without the overhead of branching instructions!
 
@@ -434,4 +436,4 @@ Remember that the condition or status bits have already been set based upon whet
 
 `Line 28` will branch to the next iteration of the loop if `x3` has not yet advanced as far as `x4` sitting past the end of the array.
 
-`Line 30` is simply a `ret` because the value we want to return has been sitting in `x0` all along!
+`Line 30` is simply a `ret` without no other bookkeeping because the value we want to return has been sitting in `x0` all along! A reminder that we did not need to preserve the value of `x30`, for example, because this function makes no function calls. `x30`, our return address, remains safely unchanged.
