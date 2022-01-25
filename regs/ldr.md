@@ -378,13 +378,13 @@ This instruction is the same as:
 
 We did not choose the value 99 at random. This line was written at a time when we did not yet know what other temporary labels we might be needing. 99 is a large number that we would be unlikely to run into with other temporary labels. You might establish the habit of using a value like 99 to be your favorite value for the last label in a function.
 
-`Line 14` implements `line 18` of the `C` code. 
+`Line 14` implements `line 18` of the `C` code.
 
 The closing brace found on `line 30` of the `C` code is implemented on `line 30` of the assembly language code. A coincidence, surely.
 
 `Line 15` establishes the oldest age found so far as being 0.
 
-`Line 16` copies the base address of the array to `x3` from `x0`. The value arrives in `x0` because it is the first parameter to the function. It must be an `x` register because it is a pointer. We need a pointer to march through the array. `x0` serves double duty as holding the first parameter but also as the place where function return values are found. 
+`Line 16` copies the base address of the array to `x3` from `x0`. The value arrives in `x0` because it is the first parameter to the function. It must be an `x` register because it is a pointer. We need a pointer to march through the array. `x0` serves double duty as holding the first parameter but also as the place where function return values are found.
 
 We copy `x0` out to `x3` so that we can use `x0` to store a pointer to the array element representing the oldest person found so far. If we iterated over the array using `x0`, we would still a) need another `x` register to hold the pointer to the oldest person so far and b) have to copy this register to `x0` before we return anyway. Doing the marching through the array is a register *other* than `x0` saves us one instruction.
 

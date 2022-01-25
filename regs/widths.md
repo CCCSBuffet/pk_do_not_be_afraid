@@ -65,7 +65,7 @@ ram:    .quad   0xFFFFFFFFFFFFFFFF                                      // 14
 
 The next four lines put zeros into that memory using progressively wider store instructions.
 
-The following is a copy of a `gdb` session running the above program. Line numbers have been added to assist with the description of the session. Rather than describe all afterwards, descriptions will be provided inline.
+The following is a `gdb` session running the above program. Line numbers have been added to assist with the description of the session. Rather than describe all after a wall of text, descriptions will be provided inline.
 
 ```text
 (gdb) b main                                                            // 1 
@@ -89,7 +89,7 @@ We launched the program and `gdb` stops its execution upon reaching the breakpoi
 $1 = 0x1                                                                // 9 
 ```
 
-Before putting zero into `x0`, let's see what it currently holds... the value 1. Recall this is `argc`.
+Before putting zero into `x0`, let's see what it currently holds... the value 1. Recall this is `argc`. The `p` command means `print` and is used to print the values in registers. The modifier `/x` says to print in hexadecimal.
 
 ```text
 (gdb) n                                                                 // 10 
@@ -194,7 +194,7 @@ But what if we look at these 8 bytes individually?
 0xaaaaaaabb010: 0x00    0xff    0xff    0xff    0xff    0xff    0xff    0xff
 ```
 
-Look at that... the *least significant* byte of a `long` comes **first**. 
+Look at that... the *least significant* byte of a `long` comes **first**.
 
 This is the definition of `little endian`.
 
@@ -243,15 +243,10 @@ Endiannes isn't an issue unless you're exchanging data with a computer that has 
 
 ### What Happens to the Rest of a Register When Only a Portion is Affected?
 
-### Other Instructions
+Whenever a narrower portion of a register is written to, the remainder of the registe is zero'd out. That is: `strb` overwrites the least significant byte of an `x` register and zeros out the upper 7 bytes.
 
-Many other instructions operate upon different widths. For example:
+*There are dedicated instructions for manipulating bits in the middle of registers*.
 
-```asm
-    add    x0, x0, x1 // operate upon a long
-    add    w0, w0, w1 // operate upon an int
-WRONG    addh   w0, w0, w1 // operate upon a short
-WRONG    addb   w0, w0, w1 // operate upon a byte
-```
+### Casting Between `int` Type
 
-## Casting Between `int` Types
+Casting between integer types is in some cases accomplished by `anding` with `255` and `65535` (for `char` and `short`). Otherwise, see the previous section (What Happens to the Rest of a Register...).
