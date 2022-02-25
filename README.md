@@ -49,6 +49,13 @@ All the action happens in the registers. Bottom line is that the variables you a
 | [What Registers Must be Backed Up and Why](./regs/backup.md) | Constraints placed on register use |
 | [`ldr` and Friends](./regs/ldr.md) | Review and amplification of the `ldr` instructions and by extension, the `str` instructions - with a number of programming examples |
 | [Register Widths](./regs/widths.md) | Demonstrated with examples and a `gdb` session plus a discussion on *endianness* |
-| Floating Point Registers | No written |
+| Floating Point Registers | Not written |
 | Scratch Registers | Not written |
 | Push and Pop of Registers | Not written |
+
+[Here](./float/README.md) is a first start on floating point chapters.
+
+1. Loading 4 floats from memory.
+2. A NEON (SIMD) operation on all four simultaneously.
+3. Up-conversion from single to double precision.
+4. Passing floats to a "C" function (printf in this case)
