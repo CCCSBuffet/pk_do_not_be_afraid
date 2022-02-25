@@ -1,5 +1,8 @@
 # Barely Begun Chapter Relating to Floats and NEON
 
+The program below demonstrates a number of concepts relating to processing of floats,
+double precision and vector (NEON) instructions.
+
 ```text
         .text                                                                    // 1 
         .align  4                                                                // 2 
@@ -53,3 +56,41 @@ fmt:    .asciz      "%f %f %f %f\n"                                             
                                                                                  // 50 
         .end                                                                     // 51 
 ```
+
+## NEON
+
+The NEON instruction set is an addition to the AARCH64 ISA. This addition is optional on ARM processors - it may or
+may not be present on a particular ARM CPU. The NEON instruction set is an example of a SIMD instruction set.
+
+SIMD stands for:
+
+- Single
+- Instruction
+- Multiple
+- Data
+
+The native width of an ARM floating point register is 128 bits. This is twice the width of the general purpose X registers. There are 32 floating point registers subject to a similar aliasing systems used with X (and W) registers.
+
+![regs](./fregs.svg)
+
+| Register | Width (bits) | Usage |
+| -------- | ----- | ----- |
+| V | 128 | vector instructions |
+| Q | 128 | non-vector superwide |
+| D | 64 | double precision |
+| S | 32 | single precision |
+| H | 16 | half precision |
+
+V registers can be easily broken down into pieces as in `Line 30` in the program above which extracts the first single precision value in a V register, putting it into an S register by itself.
+
+For NEON instructions, the interpretation of each V register is defined when you name it in the instruction: V[*register number*].[*number of primitives*][*size of primitives*]. For an example, see `Line 15` of the program above which performs a NEON `add` on four single precision floats simultaneously.
+
+![vregs](./vregs.svg)
+
+### Vector instructions for scientific computing
+
+Solving matrix equations are extremely important in many fields. More to come here.
+
+## Q registers
+
+The Q register alias is handly for moving multiple floats (any precision) into a vector register. Q registers are also handy for use as intermediate registers for bulk copying of memory (covered elsewhere).
