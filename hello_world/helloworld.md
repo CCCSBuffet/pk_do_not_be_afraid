@@ -2,12 +2,13 @@
 
 ## Attribution
 
-This work is created by Perry Kivolowitz, Professor and Chair of Computer Science at Carthage College. It is copyright © 2021 and may be freely
-shared for educational purposes.
+This work is created by Perry Kivolowitz, Professor and Chair of Computer Science at Carthage College. 
+It is copyright © 2021 and may be freely shared for educational purposes.
 
 ## Overview
 
-This document is a gentle introduction to ARM V8 Assembly Language.
+This document is a "gentle" introduction to ARM V8 Assembly Language.
+
 What makes this a "gentle" introduction is that we start out with a C++
 program close to "Hello World" and break it down into several versions
 which are closer and closer to a high level assembly language (otherwise
@@ -17,12 +18,15 @@ At each step, we'll completely explain the code and document what has
 changed from version to version so that little background is assumed.
 
 Note that the assembly language conventions followed in this introduction
-conforms to Linux. MacOS uses a different convention so if you're on a Mac
-will need to use a VM. Similarly, on Windows you will need to use WSL (the
-Windows Subsystem for Linux). We apologize for this complication but take
-this step so that the same assembly language will work on the three major
-platforms (which is a bit of a stretch because all three platforms devolve
-to Linux).
+conforms to Linux. MacOS uses a different convention so if you're on an
+ARM-based Mac, you'll still need to use a VM. Thank you Apple. Think
+Different!
+
+Similarly, on an ARM-based Windows machine you will need to use WSL (the
+Windows Subsystem for Linux).
+
+If you are on an Intel-based machine, you'll need to emuate an ARM-based machine
+in software.
 
 ## V1 in C++
 
@@ -56,10 +60,12 @@ three plus four
 % 
 ```
 
+As you can see in the output, the program printed each of the command line parameters in the order in which they were specified. These come to your program stored in an array called
+(by convention) `argv` as the second parameter to `main()`.
+
 ### Line 1
 
-`Line 1` makes available the default output stream `cout`. `cout` stands for `c`onsole `out`put. The angle brackets (`<` and `>`) indicate the include file `iostream` comes from a language supplied directory as opposed to an
-include file written by you.
+`Line 1` makes available the default output stream `cout`. `cout` stands for `c`onsole `out`put. The angle brackets (`<` and `>`) indicate the include file `iostream` comes from a language or system supplied supplied directory as opposed to an include file written by you.
 
 For an explanation of what an `include` file is and how it fits into the compilation workflow see [here](https://youtu.be/Iv3psS4n9j8).
 
